@@ -1,0 +1,2 @@
+C:\Users\David\Desktop\Personal Projects\CS3113\Project 1\Debug\SDLProject.exe
+C:\Users\David\Desktop\Personal Projects\CS3113\Project 1\Debug\SDLProject.pdb
