@@ -25,7 +25,8 @@ float megaman_y = 4;
 float bs_x = 0;
 float bls_x1 = 0;
 float bls_x2 = 0;
-float rotate_deg = 0;
+float rotate_deg1 = 0;
+float rotate_deg2 = 0;
 float lastTicks = 0;
 int width = 640;
 int height = 480;
@@ -98,12 +99,13 @@ void Update() {
     float ticks = (float)SDL_GetTicks() / 1000.0f;
     float delta = ticks - lastTicks;
     lastTicks = ticks;
+
     megamanMatrix = glm::mat4(1.0f);
     black_spikeMatrix1 = glm::mat4(1.0f);
     blue_spikeMatrix = glm::mat4(1.0f);
     black_spikeMatrix2 = glm::mat4(1.0f);
-    rotate_deg += 45.0f * delta;
-    
+    rotate_deg1 += 90.0f * delta;
+    rotate_deg2 -= 90.0f * delta;
 
     // moving megamen down and reset
     if (megaman_y > -4)
@@ -120,15 +122,15 @@ void Update() {
     else
         bs_x -= 1.0f * delta;
     blue_spikeMatrix = glm::translate(blue_spikeMatrix, glm::vec3(bs_x, 0.0f, 0.0f));
-    blue_spikeMatrix = glm::rotate(blue_spikeMatrix, glm::radians(rotate_deg), glm::vec3(0.0f, 0.0f, 1.0f));
+    blue_spikeMatrix = glm::rotate(blue_spikeMatrix, glm::radians(rotate_deg1), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // black spike 1 rotating
     black_spikeMatrix1 = glm::translate(black_spikeMatrix1, glm::vec3(2.0f, 2.0f, 0.0f));
-    black_spikeMatrix1 = glm::rotate(black_spikeMatrix1, glm::radians(rotate_deg), glm::vec3(0.0f, 0.0f, 1.0f));
+    black_spikeMatrix1 = glm::rotate(black_spikeMatrix1, glm::radians(rotate_deg1), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // black spike 2 rotating
     black_spikeMatrix2 = glm::translate(black_spikeMatrix2, glm::vec3(2.0f, -2.0f, 0.0f));
-    black_spikeMatrix2 = glm::rotate(black_spikeMatrix2, glm::radians(rotate_deg), glm::vec3(0.0f, 0.0f, 1.0f));
+    black_spikeMatrix2 = glm::rotate(black_spikeMatrix2, glm::radians(rotate_deg2), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void DrawObject(glm::mat4 matrix, GLuint textureID) {
@@ -148,7 +150,7 @@ void Render() {
     glEnableVertexAttribArray(program.texCoordAttribute);
     program.SetModelMatrix(megamanMatrix);
 
-    // draw my sprites
+    // draw objects
     DrawObject(megamanMatrix, p_TID);
     DrawObject(blue_spikeMatrix, bs_TID);
     DrawObject(black_spikeMatrix1, bls_TID);
