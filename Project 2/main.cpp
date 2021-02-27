@@ -43,13 +43,12 @@ void Initialize() {
 	pong_matrix = glm::mat4(1.0f);
 	projectionMatrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 	
-	// set up players and pong x locations
-	p1_position.x = -4.5f;
-	p2_position.x = 4.5f;
-	pong_position.x = 0;
+	// set up players and pong locations
+	p1_position = glm::vec3(-4.5f, 0.0f, 0.0f);
+	p2_position = glm::vec3(4.5f, 0.0f, 0.0f);
+	pong_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	// set up pong movements
-	pong_movement.x = 0.5;
-	pong_movement.y = -1.0;
+	pong_movement = glm::vec3(0.5f, -1.0f, 0.0f);
 
 	program.SetProjectionMatrix(projectionMatrix);
 	program.SetViewMatrix(viewMatrix);
@@ -129,6 +128,7 @@ void CollisionUpdate() {
 	}
 	// check if passed either player
 	if (pong_position.x <= -4.5 || pong_position.x >= 4.5) {
+		// stops the game
 		startgame = false;
 		gameover = true;
 	}
