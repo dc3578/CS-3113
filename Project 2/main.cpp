@@ -23,6 +23,8 @@ float paddle_speed = 2.0f;
 float pong_speed = 2.5f;
 bool startgame = false;
 bool gameover = false;
+int xdir = 1;
+int ydir = 1;
 
 
 void Initialize() {
@@ -80,6 +82,7 @@ void ProcessInput() {
 	}
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	// allow paddle movement until the game is over
 	if (!gameover) {
 		// player 1 buttons
 		if (keys[SDL_SCANCODE_W]) {
@@ -105,35 +108,6 @@ void ProcessInput() {
 	}
 }
 
-bool isColliding(glm::vec3 player_position, glm::vec3 pong_position) {
-	float w1 = 0.5;
-	float h1 = 0.5;
-	float w2 = 0.4;
-	float h2 = 2.0;
-	float xdist = fabs(player_position.x - pong_position.x) - ((w1 + w2) / 2.0f);
-	float ydist = fabs(player_position.y - pong_position.y) - ((h1 + h2) / 2.0f);
-	return xdist < 0 && ydist < 0;
-}
-
-void CollisionUpdate() {
-	bool leftCollide = isColliding(p1_position, pong_position);
-	bool rightCollide = isColliding(p2_position, pong_position);
-	// check if collision with either player
-	if (leftCollide || rightCollide) {
-		pong_movement.x *= -1.0f;
-	}
-	// check if collide with top/bottom of window
-	if (pong_position.y >= 3.5 || pong_position.y <= -3.5) {
-		pong_movement.y *= -1.0f;
-	}
-	// check if passed either player
-	if (pong_position.x <= -4.5 || pong_position.x >= 4.5) {
-		// stops the game
-		startgame = false;
-		gameover = true;
-	}
-}
-
 void p1Update(float delta) {
 	p1_position += p1_movement * paddle_speed * delta;
 	if (p1_position.y < 2.75 && p1_position.y > -2.75) {
@@ -155,6 +129,43 @@ void p2Update(float delta) {
 		p2_position -= p2_movement * paddle_speed * delta;
 	}
 
+}
+
+bool isColliding(glm::vec3 player_position, glm::vec3 pong_position) {
+	float w1 = 0.4f;
+	float h1 = 0.4f;
+	float w2 = 0.4f;
+	float h2 = 2.0f;
+	float xdist = fabs(player_position.x - pong_position.x) - ((w1 + w2) / 2.0f);
+	float ydist = fabs(player_position.y - pong_position.y) - ((h1 + h2) / 2.0f);
+	return xdist < 0 && ydist < 0;
+}
+
+void CollisionUpdate() {
+	bool leftCollide = isColliding(p1_position, pong_position);
+	bool rightCollide = isColliding(p2_position, pong_position);
+	// check if collide with left player
+	if (leftCollide) {
+		pong_movement.x = 1.0f;
+	}
+	// check if collide with right player
+	if (rightCollide) {
+		pong_movement.x = -1.0f;
+	}
+	// check if collide with top of window
+	if (pong_position.y >= 3.5) {
+		pong_movement.y = -1.0f;
+	}
+	// check if collide with bottom of window
+	if (pong_position.y <= -3.5) {
+		pong_movement.y = 1.0f;
+	}
+	// check if passed either player
+	if (pong_position.x <= -4.5 || pong_position.x >= 4.5) {
+		// stops the game
+		startgame = false;
+		gameover = true;
+	}
 }
 
 void pongUpdate(float delta) {
@@ -185,7 +196,7 @@ void DrawObject(glm::mat4 matrix, float vertices[]) {
 void Render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// pong
-	float pong_vertices[] = {-0.25, -0.25, 0.25, -0.25, 0.25, 0.25, -0.25, -0.25, 0.25, 0.25, -0.25, 0.25};
+	float pong_vertices[] = {-0.2, -0.2, 0.2, -0.2, 0.2, 0.2, -0.2, -0.2, 0.2, 0.2, -0.2, 0.2};
 	DrawObject(pong_matrix, pong_vertices);
 	// paddles
 	float paddle_vertices[] = { -0.2, -1.0, 0.2, -1.0, 0.2, 1.0, -0.2, -1.0, -0.2, 1.0, 0.2, 1.0 };
