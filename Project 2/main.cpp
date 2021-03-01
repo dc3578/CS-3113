@@ -50,7 +50,7 @@ void Initialize() {
 	p2_position = glm::vec3(4.5f, 0.0f, 0.0f);
 	pong_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	// set up pong movements
-	pong_movement = glm::vec3(0.5f, -1.0f, 0.0f);
+	pong_movement = glm::vec3(1.0f, 1.0f, 0.0f);
 
 	program.SetProjectionMatrix(projectionMatrix);
 	program.SetViewMatrix(viewMatrix);
@@ -94,7 +94,6 @@ void ProcessInput() {
 		if (glm::length(p1_movement) > 1.0f) {
 			p1_movement = glm::normalize(p1_movement);
 		}
-
 		// player 2 buttons
 		if (keys[SDL_SCANCODE_UP]) {
 			p2_movement.y = 1.0f;
@@ -128,7 +127,6 @@ void p2Update(float delta) {
 	else {
 		p2_position -= p2_movement * paddle_speed * delta;
 	}
-
 }
 
 bool isColliding(glm::vec3 player_position, glm::vec3 pong_position) {
