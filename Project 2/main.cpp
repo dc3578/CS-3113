@@ -23,9 +23,6 @@ float paddle_speed = 2.0f;
 float pong_speed = 2.5f;
 bool startgame = false;
 bool gameover = false;
-int xdir = 1;
-int ydir = 1;
-
 
 void Initialize() {
 	SDL_Init(SDL_INIT_VIDEO);
