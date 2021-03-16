@@ -30,9 +30,9 @@ void Initialize() {
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 
-#ifdef _WINDOWS
-	glewInit();
-#endif
+	#ifdef _WINDOWS
+		glewInit();
+	#endif
 
 	glViewport(0, 0, width, height);
 	program.Load("shaders/vertex.glsl", "shaders/fragment.glsl");
