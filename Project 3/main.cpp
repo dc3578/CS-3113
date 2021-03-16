@@ -96,6 +96,50 @@ void DrawText(ShaderProgram* program, GLuint fontTextureID, std::string text,
     glDisableVertexAttribArray(program->texCoordAttribute);
 }
 
+void MakePlatforms() {
+    state.objects = new Entity[OBJECT_COUNT];
+    GLuint obstacle_TID = LoadTexture("platform_obstacle.png");
+    GLuint landing_TID = LoadTexture("platform_landing.png");
+
+    int i = 0;
+    float x = -4.5;
+    float y = -3.5;
+    // first 16 platforms for left/right walls
+    for (; i < 16; i++) {
+        // reset coordinates for right wall
+        if (i == 8) {
+            y = -3.5;
+            x = 4.5;
+        }
+        state.objects[i].textureID = obstacle_TID;
+        state.objects[i].position = glm::vec3(x, y, 0);
+        y += 1.0;
+    }
+    // next 8 platforms for the floor : includes landing tiles
+    x = -3.5;
+    for (; i < 24; i++) {
+        // tile 16 & 17 are the landing platforms
+        if (i < 18) {
+            state.objects[i].textureID = landing_TID;
+            std::cout << i << std::endl;
+        }
+        else {
+            state.objects[i].textureID = obstacle_TID;
+        }
+        state.objects[i].position = glm::vec3(x, -3.5, 0);
+        x += 1.0;
+    }
+    // last 4 platforms are within the walls
+    state.objects[24].textureID = obstacle_TID;
+    state.objects[24].position = glm::vec3(-3.5, 2.25, 0);;
+    state.objects[25].textureID = obstacle_TID;
+    state.objects[25].position = glm::vec3(-2.5, 2.25, 0);;
+    state.objects[26].textureID = obstacle_TID;
+    state.objects[26].position = glm::vec3(0, 0, 0);;
+    state.objects[27].textureID = obstacle_TID;
+    state.objects[27].position = glm::vec3(1, 0, 0);;
+}
+
 void Initialize() {
     SDL_Init(SDL_INIT_VIDEO);
     displayWindow = SDL_CreateWindow("Lunar Lander!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
@@ -134,46 +178,7 @@ void Initialize() {
     state.player->textureID = LoadTexture("ship_red.png");
 
     // Initialize platforms And Landing Platform
-    state.objects = new Entity[OBJECT_COUNT];
-    GLuint obstacle_TID = LoadTexture("platform_obstacle.png");
-    GLuint landing_TID = LoadTexture("platform_landing.png");
-
-    int i = 0;
-    // first 16 platforms for left/right walls
-    float x = -4.5;
-    float y = -3.5;
-    for (; i < 16; i++) {
-        if (i == 8) {
-            y = -3.5;
-            x = 4.5;
-        }
-        state.objects[i].textureID = obstacle_TID;
-        state.objects[i].position = glm::vec3(x, y, 0);
-        y += 1.0;
-    }
-    // next 8 platforms for the floor : includes landing tiles
-    x = -3.5;
-    for (; i < 24; i++) {
-        // tile 16 & 17 are the landing platforms
-        if (i < 18) {
-            state.objects[i].textureID = landing_TID;
-            std::cout << i << std::endl;
-        }
-        else {
-            state.objects[i].textureID = obstacle_TID;
-        }
-        state.objects[i].position = glm::vec3(x, -3.5, 0);
-        x += 1.0;
-    }
-    // last 4 platforms are within the borders
-    state.objects[24].textureID = obstacle_TID;
-    state.objects[24].position = glm::vec3(-3.5, 2.25, 0);;
-    state.objects[25].textureID = obstacle_TID;
-    state.objects[25].position = glm::vec3(-2.5, 2.25, 0);;
-    state.objects[26].textureID = obstacle_TID;
-    state.objects[26].position = glm::vec3(0, 0, 0);;
-    state.objects[27].textureID = obstacle_TID;
-    state.objects[27].position = glm::vec3(1, 0, 0);;
+    MakePlatforms();
 }
 
 void ProcessInput() {
@@ -241,13 +246,13 @@ void Update() {
 
 void Render() {
     glClear(GL_COLOR_BUFFER_BIT);
-    // render objects
+    // render players and objects
     state.player->Render(&program);
     for (int i = 0; i < OBJECT_COUNT; i++) {
         state.objects[i].Render(&program);
     }
 
-    // render text if collided with landing platform
+    // render text if collided with platforms
     if (state.player->lastCollision == &state.objects[16] || state.player->lastCollision == &state.objects[17]) {
         DrawText(&program, fontTextureID, "Mission Successful", 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
         successful = true;
