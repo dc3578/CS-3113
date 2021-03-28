@@ -139,10 +139,8 @@
   <ItemGroup>
     <Image Include="font1.png" />
     <Image Include="george_0.png" />
-    <Image Include="goomba.png" />
-    <Image Include="ship_red.png" />
+    <Image Include="ken.png" />
     <Image Include="platform_landing.png" />
-    <Image Include="platform_obstacle.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="glew32.dll" />

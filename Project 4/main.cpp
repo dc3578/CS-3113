@@ -16,7 +16,7 @@
 #include "Entity.h"
 #include <vector>
 #define OBJECT_COUNT 30
-#define ENEMY_COUNT 1
+#define ENEMY_COUNT 3
 struct GameState {
     Entity *player;
     Entity *objects;
@@ -28,7 +28,6 @@ SDL_Window* displayWindow;
 bool gameIsRunning = true;
 float gravity = -9.81f;
 GLuint fontTextureID;
-bool successful = false;
 bool gameover = false;
 
 ShaderProgram program;
@@ -118,59 +117,72 @@ void InitPlayer() {
     state.player->animRows = 4;
     state.player->height = 0.8f; 
     state.player->width = 0.8f;
-    state.player->jumpPower = 5.0f;
+    state.player->jumpPower = 7.0f;
+    state.player->entityType = PLAYER;
 }
 
 void InitPlatforms() {
     state.objects = new Entity[OBJECT_COUNT];
-    GLuint obstacle_TID = LoadTexture("platform_obstacle.png");
+    GLuint obstacle_TID = LoadTexture("platform_landing.png");
 
     int i = 0;
     float x = -5.0;
     float y = -3.5;
-    // first 16 platforms for left/right walls
-    for (; i < 16; i++) {
-        // reset coordinates for right wall
-        if (i == 8) {
-            y = -3.5;
-            x = 5.0;
+    for (int i = 0; i < OBJECT_COUNT; i++) {
+        state.objects[i].entityType = PLATFORM;
+        state.objects[i].textureID = obstacle_TID;
+        // first 16 platforms for left/right walls
+        if (i < 16) {
+            // reset coordinates for right wall
+            if (i == 8) {
+                x = 5.0;
+                y = -3.5;
+            }
+            state.objects[i].position = glm::vec3(x, y, 0);
+            y += 1.0;
         }
-        state.objects[i].textureID = obstacle_TID;
-        state.objects[i].position = glm::vec3(x, y, 0);
-        y += 1.0;
-    }
-    // next 9 platforms for the floor
-    x = -4.0;
-    for (; i < 25; i++) {
-        state.objects[i].textureID = obstacle_TID;
-        state.objects[i].position = glm::vec3(x, -3.5, 0);
-        x += 1.0;
+        // next 9 platforms for the floor
+        else if (i < 25) {
+            if (i == 16) {
+                x = -4.0;
+            }
+            state.objects[i].position = glm::vec3(x, -3.5, 0);
+            x += 1.0;
+        }
     }
     // last 5 platforms are obstacle platforms
-    state.objects[25].textureID = obstacle_TID;
     state.objects[25].position = glm::vec3(-2.5, -2.5, 0);
-    state.objects[26].textureID = obstacle_TID;
     state.objects[26].position = glm::vec3(-1.5, -2.5, 0);
-    state.objects[27].textureID = obstacle_TID;
-    state.objects[27].position = glm::vec3(0.5, -1.5, 0);
-    state.objects[28].textureID = obstacle_TID;
-    state.objects[28].position = glm::vec3(1.5, -1.5, 0);
-    state.objects[29].textureID = obstacle_TID;
-    state.objects[29].position = glm::vec3(2.5, -1.5, 0);
+    state.objects[27].position = glm::vec3(0.75, -1.5, 0);
+    state.objects[28].position = glm::vec3(1.75, -1.5, 0);
+    state.objects[29].position = glm::vec3(2.75, -1.5, 0);
 }
 
 void InitEnemies() {
     state.enemies = new Entity[ENEMY_COUNT];
-    GLuint enemy_TID = LoadTexture("goomba.png");
+    GLuint enemy_TID = LoadTexture("ken.png");
 
-    state.enemies[0].textureID = enemy_TID;
-    state.enemies[0].position = glm::vec3(-2.5, -2.5, 0);
-   
-    //state.enemies[1].textureID = enemy_TID;
-    //state.enemies[1].position = glm::vec3(2.5, -1.5, 0);
+    for (int i = 0; i < ENEMY_COUNT; i++) {
+        state.enemies[i].textureID = enemy_TID;
+        state.enemies[i].acceleration = glm::vec3(0, gravity, 0);
+        state.enemies[i].width = 0.7f;
+        state.enemies[i].entityType = ENEMY;
+        state.enemies[i].speed = 0.5f;
+    }
 
-    //state.enemies[2].textureID = enemy_TID;
-    //state.enemies[2].position = glm::vec3(2.5, -1.5, 0);
+    // on first jump platform
+    state.enemies[0].position = glm::vec3(-1.5, -1.5, 0);
+    state.enemies[0].aiType = WAITANDGO;
+    state.enemies[0].aiState = IDLE;
+    // on second jump platform
+    state.enemies[1].position = glm::vec3(2.5, -0.5, 0);
+    state.enemies[1].aiType = JUMPER;
+    state.enemies[1].jumpPower = 3.0f;
+    // on ground floor
+    state.enemies[2].position = glm::vec3(4, -2.5, 0);
+    state.enemies[2].aiType = CHASER;
+    state.enemies[2].aiState = CHASING;
+    
 }
 
 void Initialize() {
@@ -250,8 +262,18 @@ void ProcessInput() {
     }
     // stop all movement and accelleration once game is over
     else {
-        state.player->acceleration = glm::vec3(0);
-        state.player->velocity = glm::vec3(0);
+        state.player->isActive = false;
+
+        for (int i = 0; i < OBJECT_COUNT; i++) {
+            state.objects[i].acceleration = glm::vec3(0);
+            state.objects[i].velocity = glm::vec3(0);
+        }
+
+        for (int i = 0; i < ENEMY_COUNT; i++) {
+            state.enemies[i].acceleration = glm::vec3(0);
+            state.enemies[i].velocity = glm::vec3(0);
+            state.enemies[i].movement = glm::vec3(0);
+        }
     }
 }
 
@@ -266,21 +288,21 @@ void Update() {
 
     // only update platforms 1 time
     for (int i = 0; i < OBJECT_COUNT; i++) {
-        state.objects[i].Update(0, NULL, 0);
+        state.objects[i].Update(0, NULL, NULL, NULL, 0, 0);
     }
 
-    // update enemies
-    for (int i = 0; i < ENEMY_COUNT; i++) {
-        state.objects[i].Update(FIXED_TIMESTEP, state.objects, OBJECT_COUNT);
-    }
-    
     if (delta < FIXED_TIMESTEP) {
         accumulator = delta;
         return;
     }
     while (delta >= FIXED_TIMESTEP) {
         // Update. Notice it's FIXED_TIMESTEP. Not deltaTime
-        state.player->Update(FIXED_TIMESTEP, state.objects, OBJECT_COUNT);
+        state.player->Update(FIXED_TIMESTEP, state.player, state.objects, state.enemies, OBJECT_COUNT, ENEMY_COUNT);
+
+        // update enemies
+        for (int i = 0; i < ENEMY_COUNT; i++) {
+            state.enemies[i].Update(FIXED_TIMESTEP, state.player, state.objects, state.enemies, OBJECT_COUNT, ENEMY_COUNT);
+        }
         delta -= FIXED_TIMESTEP;
     }
     accumulator = delta;
@@ -298,6 +320,15 @@ void Render() {
     // render enemies
     for (int i = 0; i < ENEMY_COUNT; i++) {
         state.enemies[i].Render(&program);
+    }
+
+    if (state.player->kills == ENEMY_COUNT) {
+        DrawText(&program, fontTextureID, "You Win!", 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
+        gameover = true;
+    }
+    else if (state.player->lastCollision != NULL && state.player->hitEnemy && !state.player->hitEnemyHead) {
+        DrawText(&program, fontTextureID, "You Lose!", 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
+        gameover = true;
     }
 
     SDL_GL_SwapWindow(displayWindow);

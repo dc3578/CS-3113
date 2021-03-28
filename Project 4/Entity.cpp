@@ -11,10 +11,14 @@ Entity::Entity()
 }
 
 bool Entity::CheckCollision(Entity* other) {
+    if (!isActive || !other->isActive) return false;
     float xdist = fabs(position.x - other->position.x) - ((width + other->width) / 2.0f);
     float ydist = fabs(position.y - other->position.y) - ((height + other->height) / 2.0f);
     if (xdist < 0 && ydist < 0) {
         lastCollision = other;
+        if (other->entityType == ENEMY) {
+            hitEnemy = true;
+        }
         return true;
     }
     return false;
@@ -38,6 +42,9 @@ void Entity::CheckCollisionsY(Entity* objects, int objectCount)
                 position.y += penetrationY;
                 velocity.y = 0;
                 collidedBottom = true;
+                if (entityType == PLAYER && object->entityType == ENEMY) {
+                    hitEnemyHead = true;
+                }
             }
         }
     }
@@ -66,9 +73,69 @@ void Entity::CheckCollisionsX(Entity* objects, int objectCount)
     }
 }
 
-void Entity::Update(float deltaTime, Entity* platforms, int platformCount)
+void Entity::AIJumper() {
+    if (collidedBottom) {
+        jump = true;
+    }
+}
+
+void Entity::AIWaitAndGo(Entity* player) {
+    switch (aiState) {
+        case IDLE:
+            if (glm::distance(position, player->position) < 2.0f) {
+                aiState = WALKING;
+            }
+            break;
+        case WALKING:
+            if (player->isActive) {
+                movement = glm::vec3(-1, 0, 0);
+                break;
+            }
+    }
+}
+
+void Entity::AIChaser(Entity* player) {
+    switch (aiState) {
+        case CHASING:
+            if (player->isActive) {
+                if (player->position.x < position.x) {
+                    movement = glm::vec3(-1, 0, 0);
+                }
+                else {
+                    movement = glm::vec3(1, 0, 0);
+                }
+                break;
+            }
+    }
+}
+
+void Entity::AI(Entity* player) {
+    switch (aiType) {
+
+    case JUMPER:
+        AIJumper();
+        break;
+
+    case WAITANDGO:
+        AIWaitAndGo(player);
+        break;
+
+    case CHASER:
+        AIChaser(player);
+        break;
+
+    }
+}
+
+void Entity::Update(float deltaTime, Entity* player, Entity* platforms, Entity* enemies, int platformCount, int enemyCount)
 {
-    if (isActive == false) return;
+    if (!isActive) return;
+
+    // need to know colission for AI before clearing
+    if (entityType == ENEMY) {
+        AI(player);
+    }
+
     collidedTop = false;
     collidedBottom = false;
     collidedLeft = false;
@@ -105,6 +172,24 @@ void Entity::Update(float deltaTime, Entity* platforms, int platformCount)
     position.x += velocity.x * deltaTime;       // Move on X
     CheckCollisionsX(platforms, platformCount); // Fix if needed
 
+    // if player then check collision with enemy
+    if (entityType == PLAYER) {
+        CheckCollisionsY(enemies, enemyCount); // Fix if needed
+        CheckCollisionsX(enemies, enemyCount); // Fix if needed
+        // update hit enemy flags after hitting enemy
+        if (hitEnemy && hitEnemyHead) {
+            lastCollision->isActive = false;
+            hitEnemyHead = false;
+            hitEnemy = false;
+            kills++;
+        }
+    }
+    // this is so enemies can't go through players
+    else if (entityType == ENEMY) {
+        CheckCollisionsY(player, 1); // Fix if needed
+        CheckCollisionsX(player, 1); // Fix if needed
+    }
+
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
 }
@@ -137,6 +222,7 @@ void Entity::DrawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID
 }
 
 void Entity::Render(ShaderProgram *program) {
+    if (!isActive && entityType != PLAYER) return;
     program->SetModelMatrix(modelMatrix);
     
     if (animIndices != NULL) {

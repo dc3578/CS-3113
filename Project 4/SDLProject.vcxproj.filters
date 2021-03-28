@@ -37,12 +37,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="ship_red.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="platform_obstacle.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="platform_landing.png">
       <Filter>Resource Files</Filter>
     </Image>
@@ -52,7 +46,7 @@
     <Image Include="george_0.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="goomba.png">
+    <Image Include="ken.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
