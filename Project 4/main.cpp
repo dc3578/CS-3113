@@ -167,18 +167,18 @@ void InitEnemies() {
         state.enemies[i].acceleration = glm::vec3(0, gravity, 0);
         state.enemies[i].width = 0.7f;
         state.enemies[i].entityType = ENEMY;
-        state.enemies[i].speed = 0.5f;
+        state.enemies[i].speed = 0.75f;
     }
 
-    // on first jump platform
+    // spawn on first jump platform
     state.enemies[0].position = glm::vec3(-1.5, -1.5, 0);
     state.enemies[0].aiType = WAITANDGO;
     state.enemies[0].aiState = IDLE;
-    // on second jump platform
+    // spawn on second jump platform
     state.enemies[1].position = glm::vec3(2.5, -0.5, 0);
     state.enemies[1].aiType = JUMPER;
     state.enemies[1].jumpPower = 3.0f;
-    // on ground floor
+    // spawn on ground floor
     state.enemies[2].position = glm::vec3(4, -2.5, 0);
     state.enemies[2].aiType = CHASER;
     state.enemies[2].aiState = CHASING;
@@ -215,7 +215,7 @@ void Initialize() {
     fontTextureID = LoadTexture("font1.png");
     // Initialize Player
     InitPlayer();
-    // Initialize platforms And Landing Platform
+    // Initialize Platforms
     InitPlatforms();
     // Initialize Enemies
     InitEnemies();
@@ -244,7 +244,7 @@ void ProcessInput() {
     }
 
     const Uint8* keys = SDL_GetKeyboardState(NULL);
-    // only process input while game is not over
+    // only process input while not gameover
     if (!gameover) {
         const Uint8* keys = SDL_GetKeyboardState(NULL);
         if (keys[SDL_SCANCODE_LEFT]) {
@@ -263,12 +263,7 @@ void ProcessInput() {
     // stop all movement and accelleration once game is over
     else {
         state.player->isActive = false;
-
-        for (int i = 0; i < OBJECT_COUNT; i++) {
-            state.objects[i].acceleration = glm::vec3(0);
-            state.objects[i].velocity = glm::vec3(0);
-        }
-
+        // stop all enemy movement
         for (int i = 0; i < ENEMY_COUNT; i++) {
             state.enemies[i].acceleration = glm::vec3(0);
             state.enemies[i].velocity = glm::vec3(0);
@@ -308,7 +303,6 @@ void Update() {
     accumulator = delta;
 }
 
-
 void Render() {
     glClear(GL_COLOR_BUFFER_BIT);
     // render players 
@@ -321,11 +315,12 @@ void Render() {
     for (int i = 0; i < ENEMY_COUNT; i++) {
         state.enemies[i].Render(&program);
     }
-
+    // Render message if you win
     if (state.player->kills == ENEMY_COUNT) {
         DrawText(&program, fontTextureID, "You Win!", 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
         gameover = true;
     }
+    // Render message if you lose
     else if (state.player->lastCollision != NULL && state.player->hitEnemy && !state.player->hitEnemyHead) {
         DrawText(&program, fontTextureID, "You Lose!", 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
         gameover = true;

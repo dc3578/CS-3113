@@ -111,18 +111,17 @@ void Entity::AIChaser(Entity* player) {
 
 void Entity::AI(Entity* player) {
     switch (aiType) {
+        case JUMPER:
+            AIJumper();
+            break;
 
-    case JUMPER:
-        AIJumper();
-        break;
+        case WAITANDGO:
+            AIWaitAndGo(player);
+            break;
 
-    case WAITANDGO:
-        AIWaitAndGo(player);
-        break;
-
-    case CHASER:
-        AIChaser(player);
-        break;
+        case CHASER:
+            AIChaser(player);
+            break;
 
     }
 }
