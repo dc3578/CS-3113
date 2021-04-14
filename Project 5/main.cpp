@@ -275,12 +275,12 @@ void ProcessInput() {
                             state.player->jump = true;
                         }
                         break;
+                    
+                    case SDLK_RETURN:
+                        Mix_PlayMusic(state.music, -1);
+                        startgame = true;
+                        break;
                 }
-                break;
-            case SDLK_RETURN:
-                Mix_PlayMusic(state.music, -1);
-                startgame = true;
-                break;
         }
     }
 

@@ -55,6 +55,9 @@
     <Image Include="resources\platform_landing.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\heart.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\wholesome.mp3" />
