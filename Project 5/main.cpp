@@ -28,7 +28,7 @@ struct GameState {
     Entity *player;
     Entity *objects;
     Entity *enemies;
-    Entity *lives;
+    //Entity *lives;
     Mix_Music* music;
     glm::vec3 savedPoint;
 };
@@ -114,17 +114,17 @@ void InitMusic() {
     Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 }
 
-void InitLives() {
-    state.lives = new Entity[LIFE_COUNT];
-    float x = 2.0;
-    float y = 3.0;
-    for (int i = 0; i < LIFE_COUNT; i++) {
-        state.lives[i].entityType = LIFE;
-        state.lives[i].textureID = LoadTexture("resources/heart.png");
-        state.lives[i].position = glm::vec3(x, y, 0);
-        x++;
-    }
-}
+//void InitLives() {
+//    state.lives = new Entity[LIFE_COUNT];
+//    float x = 2.0;
+//    float y = 3.0;
+//    for (int i = 0; i < LIFE_COUNT; i++) {
+//        state.lives[i].entityType = LIFE;
+//        state.lives[i].textureID = LoadTexture("resources/heart.png");
+//        state.lives[i].position = glm::vec3(x, y, 0);
+//        x++;
+//    }
+//}
 
 void InitPlayer() {
     state.player = new Entity();
@@ -218,7 +218,7 @@ void InitEnemies() {
 
 void Initialize() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    displayWindow = SDL_CreateWindow("Platformer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("Jumper", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 
@@ -246,7 +246,7 @@ void Initialize() {
     // Initialize Music
     InitMusic();
     // Initialize Life Count
-    InitLives();
+    /*InitLives();*/
     // get font texture ID
     // Initialize Player
     InitPlayer();
@@ -330,10 +330,10 @@ void Update() {
             state.objects[i].Update(0, NULL, NULL, NULL, 0, 0);
         }
 
-        // update lives
-        for (int i = 0; i < LIFE_COUNT; i++) {
-            state.lives[i].Update(0, NULL, NULL, NULL, 0, 0);
-        }
+        //// update lives
+        //for (int i = 0; i < LIFE_COUNT; i++) {
+        //    state.lives[i].Update(0, NULL, NULL, NULL, 0, 0);
+        //}
 
         if (delta < FIXED_TIMESTEP) {
             accumulator = delta;
@@ -343,7 +343,7 @@ void Update() {
             // Update. Notice it's FIXED_TIMESTEP. Not deltaTime
             if (state.player->died) {
                 int lifeNum = state.player->deaths - 1;
-                state.lives[lifeNum].isActive = false;
+                //state.lives[lifeNum].isActive = false;
                 state.player->position = state.savedPoint;
                 state.player->died = false;
             }
@@ -364,8 +364,8 @@ void Render() {
     glClear(GL_COLOR_BUFFER_BIT);
     // Display Menu while game not started
     if (!startgame) {
-        DrawText(&program, fontTextureID, TITLE, 0.75, -0.375, glm::vec3(-4.0, 3.25, 0));
-        DrawText(&program, fontTextureID, MENUTEXT, 0.75, -0.375, glm::vec3(-4.0, 2.25, 0));
+        DrawText(&program, fontTextureID, TITLE, 0.5, -0.25, glm::vec3(-0.75, 0.5, 0));
+        DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, 0, 0));
     } 
     else {
         // render players 
@@ -378,23 +378,27 @@ void Render() {
         for (int i = 0; i < ENEMY_COUNT; i++) {
             state.enemies[i].Render(&program);
         }
-        // render lives
-        for (int i = 0; i < LIFE_COUNT; i++) {
-            state.lives[i].Render(&program);
-        }
+        //// render lives
+        //for (int i = 0; i < LIFE_COUNT; i++) {
+        //    state.lives[i].Render(&program);
+        //}
         // Render message if you win
         if (state.player->kills == ENEMY_COUNT) {
-            DrawText(&program, fontTextureID, WIN, 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
+            DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
             gameover = true;
         }
         // Render message if you lose
-        else if (state.player->deaths == LIFE_COUNT) {
-            DrawText(&program, fontTextureID, LOSE, 0.75, -0.375, glm::vec3(-3.5, 3.25, 0));
+        if (state.player->deaths == LIFE_COUNT) {
+            DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
             gameover = true;
         }
-        // stop music when gameover
+
         if (gameover) {
             Mix_HaltMusic();
+        }
+        else {
+            int livesLeft = LIFE_COUNT - state.player->deaths;
+            DrawText(&program, fontTextureID, "Lives: " + std::to_string(livesLeft), 0.5, -0.25, glm::vec3(-4.75f, 3.3, 0));
         }
     }
 
