@@ -31,11 +31,11 @@ public:
     float speed;
     float width = 1;
     float height = 1;
+    
     int kills = 0;
     int lives = 3;
     bool died = false;
     Mix_Chunk* jumpSound;
-
     
     bool jump = false;
     float jumpPower = 0;
@@ -70,7 +70,6 @@ public:
     void CheckCollisionsX(Entity* objects, int objectCount);
     void CheckCollisionsX(Map* map);
     void CheckCollisionsY(Map* map);
-
 
     void Update(float deltaTime, Entity* player, Entity* objects, int objectCount, Map* map);
     void Render(ShaderProgram *program);

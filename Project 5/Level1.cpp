@@ -2,24 +2,24 @@
 
 #define L1_ENEMY_COUNT 1
 
-#define LEVEL1_WIDTH 14
+#define LEVEL1_WIDTH 15
 #define LEVEL1_HEIGHT 8
 unsigned int level1_data[] =
 {
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1,
- 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2,
- 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 3, 2,
+ 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2,
+ 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
 };
 
 void Level1::Initialize() {
     state.nextScene = -1;
-	GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
-	state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, level1_data, mapTextureID, 1.0f, 4, 1);
+    GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
+    state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, level1_data, mapTextureID, 1.0f, 4, 1);
 	// Move over all of the player and enemy code from initialization.
     InitPlayer();
     InitEnemies();
@@ -27,25 +27,24 @@ void Level1::Initialize() {
 }
 
 void Level1::Update(float deltaTime) {
-	state.player->Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
+    state.player->Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
 
     // update enemies 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
     }
 
-    
-
-    // move to next level after killing all enemies and passing a point
-    if (state.player->kills == L1_ENEMY_COUNT && state.player->position.x >= 12) {
+    // move to next level after killing all enemies and landing on a tile
+    int loc = LEVEL1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
+    if (state.player->kills == L1_ENEMY_COUNT && level1_data[loc] == 3) {
         state.nextScene = 1;
         state.player->kills = 0;
     }
 }
 
 void Level1::Render(ShaderProgram* program) {
-	state.map->Render(program);
-	state.player->Render(program);
+    state.map->Render(program);
+    state.player->Render(program);
 
     // render enemies 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
