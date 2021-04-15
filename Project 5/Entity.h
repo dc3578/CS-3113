@@ -1,3 +1,4 @@
+#pragma once
 #define GL_SILENCE_DEPRECATION
 
 #ifdef _WINDOWS
@@ -10,6 +11,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "ShaderProgram.h"
+#include "Map.h"
 #include <SDL_mixer.h>
 
 enum EntityType {PLAYER, PLATFORM, ENEMY, LIFE};
@@ -25,11 +27,12 @@ public:
     glm::vec3 movement;
     glm::vec3 acceleration;
     glm::vec3 velocity;
+    glm::vec3 savedPoint;
     float speed;
     float width = 1;
     float height = 1;
     int kills = 0;
-    int deaths = 0;
+    int lives = 3;
     bool died = false;
     Mix_Chunk* jumpSound;
 
@@ -65,12 +68,15 @@ public:
     bool CheckCollision(Entity* other);
     void CheckCollisionsY(Entity* objects, int objectCount);
     void CheckCollisionsX(Entity* objects, int objectCount);
-    void Update(float deltaTime, Entity* player, Entity* platforms, Entity* enemies, int platformCount, int enemyCount);
+    void CheckCollisionsX(Map* map);
+    void CheckCollisionsY(Map* map);
+
+
+    void Update(float deltaTime, Entity* player, Entity* objects, int objectCount, Map* map);
     void Render(ShaderProgram *program);
     void DrawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID, int index);
 
     void AI(Entity* player);
-    void AIWalker();
     void AIJumper();
     void AIWaitAndGo(Entity* player);
     void AIChaser(Entity* player);

@@ -12,209 +12,40 @@
 #include "ShaderProgram.h"
 #include <SDL_mixer.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include "Entity.h"
 #include <vector>
-#define OBJECT_COUNT 30
-#define ENEMY_COUNT 3
-#define LIFE_COUNT 3
-#define WIN "You Win!"
-#define LOSE "You Lose!"
-#define TITLE "JUMPER"
+#include "Entity.h"
+#include "Map.h"
+#include "Util.h"
+#include "Scene.h"
+#include "Level1.h"
+#include "Level2.h"
+#include "Level3.h"
+
+
+//#define LIFE_COUNT 3
+#define LEVEL_COUNT 3
+#define TITLE "Jumper"
 #define MENUTEXT "Press Enter To Play"
-
-struct GameState {
-    Entity *player;
-    Entity *objects;
-    Entity *enemies;
-    //Entity *lives;
-    Mix_Music* music;
-    glm::vec3 savedPoint;
-};
-
-GameState state;
-SDL_Window* displayWindow;
-bool gameIsRunning = true;
-float gravity = -9.81f;
-GLuint fontTextureID;
-bool startgame = false;
-bool gameover = false;
+//#define WIN "You Win!"
+//#define LOSE "You Lose!"
 
 ShaderProgram program;
 glm::mat4 viewMatrix, modelMatrix, projectionMatrix;
 
-GLuint LoadTexture(const char* filePath) {
-    int w, h, n;
-    unsigned char* image = stbi_load(filePath, &w, &h, &n, STBI_rgb_alpha);
+SDL_Window* displayWindow;
+bool gameIsRunning = true;
+bool startgame = false;
+bool gameover = false;
+GLuint fontTextureID;
 
-    if (image == NULL) {
-        std::cout << "Unable to load image. Make sure the path is correct\n";
-        assert(false);
-    }
+Scene* currentScene;
+Scene* sceneList[LEVEL_COUNT];
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    stbi_image_free(image);
-    return textureID;
+void SwitchToScene(Scene* scene) {
+    currentScene = scene;
+    currentScene->Initialize();
 }
-
-void DrawText(ShaderProgram* program, GLuint fontTextureID, std::string text,
-    float size, float spacing, glm::vec3 position)
-{
-    float width = 1.0f / 16.0f;
-    float height = 1.0f / 16.0f;
-    std::vector<float> vertices;
-    std::vector<float> texCoords;
-    for (int i = 0; i < text.size(); i++) {
-        int index = (int)text[i];
-        float offset = (size + spacing) * i;
-        float u = (float)(index % 16) / 16.0f;
-        float v = (float)(index / 16) / 16.0f;
-        vertices.insert(vertices.end(), {
-            offset + (-0.5f * size), 0.5f * size,
-            offset + (-0.5f * size), -0.5f * size,
-            offset + (0.5f * size), 0.5f * size,
-            offset + (0.5f * size), -0.5f * size,
-            offset + (0.5f * size), 0.5f * size,
-            offset + (-0.5f * size), -0.5f * size,
-            });
-        texCoords.insert(texCoords.end(), {
-            u, v,
-            u, v + height,
-            u + width, v,
-            u + width, v + height,
-            u + width, v,
-            u, v + height,
-            });
-    } // end of for loop
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-    modelMatrix = glm::translate(modelMatrix, position);
-    program->SetModelMatrix(modelMatrix);
-    glUseProgram(program->programID);
-    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices.data());
-    glEnableVertexAttribArray(program->positionAttribute);
-    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords.data());
-    glEnableVertexAttribArray(program->texCoordAttribute);
-    glBindTexture(GL_TEXTURE_2D, fontTextureID);
-    glDrawArrays(GL_TRIANGLES, 0, (int)(text.size() * 6));
-    glDisableVertexAttribArray(program->positionAttribute);
-    glDisableVertexAttribArray(program->texCoordAttribute);
-}
-
-void InitMusic() {
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
-    state.music = Mix_LoadMUS("resources/wholesome.mp3");
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
-}
-
-//void InitLives() {
-//    state.lives = new Entity[LIFE_COUNT];
-//    float x = 2.0;
-//    float y = 3.0;
-//    for (int i = 0; i < LIFE_COUNT; i++) {
-//        state.lives[i].entityType = LIFE;
-//        state.lives[i].textureID = LoadTexture("resources/heart.png");
-//        state.lives[i].position = glm::vec3(x, y, 0);
-//        x++;
-//    }
-//}
-
-void InitPlayer() {
-    state.player = new Entity();
-    state.player->position = glm::vec3(-4.0, -1, 0);
-    state.savedPoint = glm::vec3(-4.0, -1, 0);
-    state.player->acceleration = glm::vec3(0, gravity, 0);
-    state.player->speed = 1.5f;
-    state.player->textureID = LoadTexture("resources/george_0.png");
-
-    state.player->animRight = new int[4]{ 3, 7, 11, 15 };
-    state.player->animLeft = new int[4]{ 1, 5, 9, 13 };
-    state.player->animUp = new int[4]{ 2, 6, 10, 14 };
-    state.player->animDown = new int[4]{ 0, 4, 8, 12 };
-
-    state.player->animIndices = state.player->animRight;
-    state.player->animFrames = 4;
-    state.player->animIndex = 0;
-    state.player->animTime = 0;
-    state.player->animCols = 4;
-    state.player->animRows = 4;
-    state.player->height = 0.8f; 
-    state.player->width = 0.8f;
-    state.player->jumpPower = 7.0f;
-    state.player->entityType = PLAYER;
-    state.player->jumpSound = Mix_LoadWAV("resources/jump.wav");
-}
-
-void InitPlatforms() {
-    state.objects = new Entity[OBJECT_COUNT];
-
-    float x = -5.0;
-    float y = -3.5;
-    for (int i = 0; i < OBJECT_COUNT; i++) {
-        state.objects[i].entityType = PLATFORM;
-        state.objects[i].textureID = LoadTexture("resources/platform_landing.png");
-        // first 16 platforms for left/right walls
-        if (i < 16) {
-            // reset coordinates for right wall
-            if (i == 8) {
-                x = 5.0;
-                y = -3.5;
-            }
-            state.objects[i].position = glm::vec3(x, y, 0);
-            y += 1.0;
-        }
-        // next 9 platforms for the floor
-        else if (i < 25) {
-            if (i == 16) {
-                x = -4.0;
-            }
-            state.objects[i].position = glm::vec3(x, -3.5, 0);
-            x += 1.0;
-        }
-    }
-    // last 5 platforms are obstacle platforms
-    state.objects[25].position = glm::vec3(-2.5, -2.5, 0);
-    state.objects[26].position = glm::vec3(-1.5, -2.5, 0);
-    state.objects[27].position = glm::vec3(0.75, -1.5, 0);
-    state.objects[28].position = glm::vec3(1.75, -1.5, 0);
-    state.objects[29].position = glm::vec3(2.75, -1.5, 0);
-}
-
-void InitEnemies() {
-    state.enemies = new Entity[ENEMY_COUNT];
-    GLuint enemy_TID = LoadTexture("resources/ken.png");
-
-    for (int i = 0; i < ENEMY_COUNT; i++) {
-        state.enemies[i].textureID = enemy_TID;
-        state.enemies[i].acceleration = glm::vec3(0, gravity, 0);
-        state.enemies[i].width = 0.7f;
-        state.enemies[i].entityType = ENEMY;
-        state.enemies[i].speed = 0.75f;
-    }
-
-    // spawn on first jump platform
-    state.enemies[0].position = glm::vec3(-1.5, -1.5, 0);
-    state.enemies[0].aiType = WAITANDGO;
-    state.enemies[0].aiState = IDLE;
-    // spawn on second jump platform
-    state.enemies[1].position = glm::vec3(2.5, -0.5, 0);
-    state.enemies[1].aiType = JUMPER;
-    state.enemies[1].jumpPower = 3.0f;
-    // spawn on ground floor
-    state.enemies[2].position = glm::vec3(4, -2.5, 0);
-    state.enemies[2].aiType = CHASER;
-    state.enemies[2].aiState = CHASING;
-    
-}
-
-
 
 void Initialize() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -241,24 +72,18 @@ void Initialize() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    fontTextureID = LoadTexture("resources/font1.png");
-    
-    // Initialize Music
-    InitMusic();
-    // Initialize Life Count
-    /*InitLives();*/
     // get font texture ID
-    // Initialize Player
-    InitPlayer();
-    // Initialize Platforms
-    InitPlatforms();
-    // Initialize Enemies
-    InitEnemies();
-    
+    fontTextureID = Util::LoadTexture("resources/font1.png");
+
+    // Init Levels
+    sceneList[0] = new Level1();
+    sceneList[1] = new Level2();
+    sceneList[2] = new Level3();
+    SwitchToScene(sceneList[0]);
 }
 
 void ProcessInput() {
-    state.player->movement = glm::vec3(0);
+    currentScene->state.player->movement = glm::vec3(0);
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -271,14 +96,16 @@ void ProcessInput() {
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_SPACE:
-                        if (state.player->collidedBottom) {
-                            state.player->jump = true;
+                        if (currentScene->state.player->collidedBottom) {
+                            currentScene->state.player->jump = true;
                         }
                         break;
                     
                     case SDLK_RETURN:
-                        Mix_PlayMusic(state.music, -1);
-                        startgame = true;
+                        if (!startgame) {
+                            Mix_PlayMusic(currentScene->state.music, -1);
+                            startgame = true;
+                        }
                         break;
                 }
         }
@@ -290,27 +117,27 @@ void ProcessInput() {
         if (!gameover) {
             const Uint8* keys = SDL_GetKeyboardState(NULL);
             if (keys[SDL_SCANCODE_LEFT]) {
-                state.player->movement.x = -1.0f;
-                state.player->animIndices = state.player->animLeft;
+                currentScene->state.player->movement.x = -1.0f;
+                currentScene->state.player->animIndices = currentScene->state.player->animLeft;
             }
             else if (keys[SDL_SCANCODE_RIGHT]) {
-                state.player->movement.x = 1.0f;
-                state.player->animIndices = state.player->animRight;
+                currentScene->state.player->movement.x = 1.0f;
+                currentScene->state.player->animIndices = currentScene->state.player->animRight;
             }
 
-            if (glm::length(state.player->movement) > 1.0f) {
-                state.player->movement = glm::normalize(state.player->movement);
+            if (glm::length(currentScene->state.player->movement) > 1.0f) {
+                currentScene->state.player->movement = glm::normalize(currentScene->state.player->movement);
             }
         }
         // stop all movement and accelleration once game is over
         else {
-            state.player->isActive = false;
+            currentScene->state.player->isActive = false;
             // stop all enemy movement
-            for (int i = 0; i < ENEMY_COUNT; i++) {
+           /* for (int i = 0; i < ENEMY_COUNT; i++) {
                 state.enemies[i].acceleration = glm::vec3(0);
                 state.enemies[i].velocity = glm::vec3(0);
                 state.enemies[i].movement = glm::vec3(0);
-            }
+            }*/
         }
     }
 }
@@ -325,81 +152,75 @@ void Update() {
         lastTicks = ticks;
         delta += accumulator;
 
-        // only update platforms 1 time
-        for (int i = 0; i < OBJECT_COUNT; i++) {
-            state.objects[i].Update(0, NULL, NULL, NULL, 0, 0);
-        }
-
-        //// update lives
-        //for (int i = 0; i < LIFE_COUNT; i++) {
-        //    state.lives[i].Update(0, NULL, NULL, NULL, 0, 0);
-        //}
-
         if (delta < FIXED_TIMESTEP) {
             accumulator = delta;
             return;
         }
         while (delta >= FIXED_TIMESTEP) {
             // Update. Notice it's FIXED_TIMESTEP. Not deltaTime
-            if (state.player->died) {
-                int lifeNum = state.player->deaths - 1;
-                //state.lives[lifeNum].isActive = false;
-                state.player->position = state.savedPoint;
-                state.player->died = false;
-            }
-            state.player->Update(FIXED_TIMESTEP, state.player, state.objects, state.enemies, OBJECT_COUNT, ENEMY_COUNT);
-
-            // update enemies
-            for (int i = 0; i < ENEMY_COUNT; i++) {
-                state.enemies[i].Update(FIXED_TIMESTEP, state.player, state.objects, state.enemies, OBJECT_COUNT, ENEMY_COUNT);
-            }
+            currentScene->Update(FIXED_TIMESTEP);
 
             delta -= FIXED_TIMESTEP;
         }
         accumulator = delta;
+
+        viewMatrix = glm::mat4(1.0f);
+        if (currentScene->state.player->position.x > 5) {
+            viewMatrix = glm::translate(viewMatrix, glm::vec3(-currentScene->state.player->position.x, 3.75, 0));
+        }
+        else {
+            viewMatrix = glm::translate(viewMatrix, glm::vec3(-5, 3.75, 0));
+        }
+
     }
 }
 
 void Render() {
     glClear(GL_COLOR_BUFFER_BIT);
+
     // Display Menu while game not started
     if (!startgame) {
-        DrawText(&program, fontTextureID, TITLE, 0.5, -0.25, glm::vec3(-0.75, 0.5, 0));
-        DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, 0, 0));
+        Util::DrawText(&program, fontTextureID, TITLE, 0.5, -0.25, glm::vec3(-0.75, 0.5, 0));
+        Util::DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, 0, 0));
     } 
     else {
-        // render players 
-        state.player->Render(&program);
-        // render objects
-        for (int i = 0; i < OBJECT_COUNT; i++) {
-            state.objects[i].Render(&program);
-        }
-        // render enemies
-        for (int i = 0; i < ENEMY_COUNT; i++) {
-            state.enemies[i].Render(&program);
-        }
-        //// render lives
-        //for (int i = 0; i < LIFE_COUNT; i++) {
-        //    state.lives[i].Render(&program);
+        program.SetViewMatrix(viewMatrix);
+
+        // render Scene 
+        currentScene->Render(&program);
+
+        //// render win/lose message
+        //if (currentScene->state.player->lives <= 0) {
+        //    Util::DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
+        //    gameover = true;
         //}
-        // Render message if you win
-        if (state.player->kills == ENEMY_COUNT) {
-            DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-            gameover = true;
-        }
-        // Render message if you lose
-        if (state.player->deaths == LIFE_COUNT) {
-            DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-            gameover = true;
-        }
+        //if (currentScene->state.nextScene == 3) {
+        //    Util::DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
+        //    gameover = true;
+        //}
 
         if (gameover) {
             Mix_HaltMusic();
         }
-        else {
-            int livesLeft = LIFE_COUNT - state.player->deaths;
-            DrawText(&program, fontTextureID, "Lives: " + std::to_string(livesLeft), 0.5, -0.25, glm::vec3(-4.75f, 3.3, 0));
-        }
+        //else {
+        //    /*Util::DrawText(&program, fontTextureID, "Lives: " + std::to_string(state.player->lives), 0.5, -0.25, glm::vec3(-4.75f, 3.3, 0));*/
+        //}
+
+        //// render lives
+        //for (int i = 0; i < LIFE_COUNT; i++) {
+        //    state.lives[i].Render(&program);
+        //}
+
+        // Render message if you win
+        //if (currentScene->state.player->kills == ENEMY_COUNT) {
+        //    Util::DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
+        //    gameover = true;
+        //}
+        //// Render message if you lose
+        //if (currentScene->state.player->deaths == LIFE_COUNT) {
+        //    Util::DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
+        //    gameover = true;
+        //}
     }
 
     SDL_GL_SwapWindow(displayWindow);
@@ -407,6 +228,8 @@ void Render() {
 
 
 void Shutdown() {
+    Mix_FreeChunk(currentScene->state.player->jumpSound);
+    Mix_FreeMusic(currentScene->state.music);
     SDL_Quit();
 }
 
@@ -416,6 +239,9 @@ int main(int argc, char* argv[]) {
     while (gameIsRunning) {
         ProcessInput();
         Update();
+
+        if (currentScene->state.nextScene >= 0) SwitchToScene(sceneList[currentScene->state.nextScene]);
+        
         Render();
     }
 

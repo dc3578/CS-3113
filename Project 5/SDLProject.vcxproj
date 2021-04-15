@@ -128,13 +128,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Level1.cpp" />
+    <ClCompile Include="Level2.cpp" />
+    <ClCompile Include="Level3.cpp" />
+    <ClCompile Include="LoseScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MenuScene.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="WinScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Level1.h" />
+    <ClInclude Include="Level2.h" />
+    <ClInclude Include="Level3.h" />
+    <ClInclude Include="LoseScene.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="MenuScene.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="WinScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="glew32.dll" />
@@ -148,6 +166,7 @@
     <Image Include="resources\heart.png" />
     <Image Include="resources\ken.png" />
     <Image Include="resources\platform_landing.png" />
+    <Image Include="resources\tileset.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\jump.wav" />

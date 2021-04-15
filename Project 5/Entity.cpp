@@ -73,60 +73,75 @@ void Entity::CheckCollisionsX(Entity* objects, int objectCount)
     }
 }
 
-void Entity::AIJumper() {
-    if (collidedBottom) {
-        jump = true;
+
+void Entity::CheckCollisionsY(Map* map)
+{
+    // Probes for tiles
+    glm::vec3 top = glm::vec3(position.x, position.y + (height / 2), position.z);
+    glm::vec3 top_left = glm::vec3(position.x - (width / 2), position.y + (height / 2), position.z);
+    glm::vec3 top_right = glm::vec3(position.x + (width / 2), position.y + (height / 2), position.z);
+
+    glm::vec3 bottom = glm::vec3(position.x, position.y - (height / 2), position.z);
+    glm::vec3 bottom_left = glm::vec3(position.x - (width / 2), position.y - (height / 2), position.z);
+    glm::vec3 bottom_right = glm::vec3(position.x + (width / 2), position.y - (height / 2), position.z);
+
+    float penetration_x = 0;
+    float penetration_y = 0;
+    if (map->IsSolid(top, &penetration_x, &penetration_y) && velocity.y > 0) {
+        position.y -= penetration_y;
+        velocity.y = 0;
+        collidedTop = true;
+    }
+    else if (map->IsSolid(top_left, &penetration_x, &penetration_y) && velocity.y > 0) {
+        position.y -= penetration_y;
+        velocity.y = 0;
+        collidedTop = true;
+    }
+    else if (map->IsSolid(top_right, &penetration_x, &penetration_y) && velocity.y > 0) {
+        position.y -= penetration_y;
+        velocity.y = 0;
+        collidedTop = true;
+    }
+    if (map->IsSolid(bottom, &penetration_x, &penetration_y) && velocity.y < 0) {
+        position.y += penetration_y;
+        velocity.y = 0;
+        collidedBottom = true;
+    }
+    else if (map->IsSolid(bottom_left, &penetration_x, &penetration_y) && velocity.y < 0) {
+        position.y += penetration_y;
+        velocity.y = 0;
+        collidedBottom = true;
+    }
+    else if (map->IsSolid(bottom_right, &penetration_x, &penetration_y) && velocity.y < 0) {
+        position.y += penetration_y;
+        velocity.y = 0;
+        collidedBottom = true;
     }
 }
 
-void Entity::AIWaitAndGo(Entity* player) {
-    switch (aiState) {
-        case IDLE:
-            if (glm::distance(position, player->position) < 2.0f) {
-                aiState = WALKING;
-            }
-            break;
-        case WALKING:
-            if (player->isActive) {
-                movement = glm::vec3(-1, 0, 0);
-                break;
-            }
+void Entity::CheckCollisionsX(Map* map)
+{
+    // Probes for tiles
+    glm::vec3 left = glm::vec3(position.x - (width / 2), position.y, position.z);
+    glm::vec3 right = glm::vec3(position.x + (width / 2), position.y, position.z);
+
+    float penetration_x = 0;
+    float penetration_y = 0;
+    if (map->IsSolid(left, &penetration_x, &penetration_y) && velocity.x < 0) {
+        position.x += penetration_x;
+        velocity.x = 0;
+        collidedLeft = true;
+    }
+
+    if (map->IsSolid(right, &penetration_x, &penetration_y) && velocity.x > 0) {
+        position.x -= penetration_x;
+        velocity.x = 0;
+        collidedRight = true;
     }
 }
 
-void Entity::AIChaser(Entity* player) {
-    switch (aiState) {
-        case CHASING:
-            if (player->isActive) {
-                if (player->position.x < position.x) {
-                    movement = glm::vec3(-1, 0, 0);
-                }
-                else {
-                    movement = glm::vec3(1, 0, 0);
-                }
-                break;
-            }
-    }
-}
 
-void Entity::AI(Entity* player) {
-    switch (aiType) {
-        case JUMPER:
-            AIJumper();
-            break;
-
-        case WAITANDGO:
-            AIWaitAndGo(player);
-            break;
-
-        case CHASER:
-            AIChaser(player);
-            break;
-
-    }
-}
-
-void Entity::Update(float deltaTime, Entity* player, Entity* platforms, Entity* enemies, int platformCount, int enemyCount)
+void Entity::Update(float deltaTime, Entity* player, Entity* objects, int objectCount, Map* map)
 {
     if (!isActive) return;
 
@@ -169,15 +184,16 @@ void Entity::Update(float deltaTime, Entity* player, Entity* platforms, Entity* 
     velocity.x = movement.x * speed;
     velocity += acceleration * deltaTime;
 
-    position.y += velocity.y * deltaTime;       // Move on Y
-    CheckCollisionsY(platforms, platformCount); // Fix if needed
-    position.x += velocity.x * deltaTime;       // Move on X
-    CheckCollisionsX(platforms, platformCount); // Fix if needed
+    position.y += velocity.y * deltaTime; // Move on Y
+    CheckCollisionsY(map);
+
+    position.x += velocity.x * deltaTime; // Move on X
+    CheckCollisionsX(map);
 
     // if player then check collision with enemy
     if (entityType == PLAYER) {
-        CheckCollisionsY(enemies, enemyCount); // Fix if needed
-        CheckCollisionsX(enemies, enemyCount); // Fix if needed
+        CheckCollisionsY(objects, objectCount); // Fix if needed
+        CheckCollisionsX(objects, objectCount); // Fix if needed
         // update hit enemy flags after hitting enemy
         if (hitEnemy) {
             if (hitEnemyHead) {
@@ -187,11 +203,18 @@ void Entity::Update(float deltaTime, Entity* player, Entity* platforms, Entity* 
             }
             else {
                 died = true;
-                deaths++;
             }
             hitEnemy = false;
         }
     }
+
+    // restart at saved point when dead
+    if (died || position.y <= -8) {
+        position = savedPoint;
+        lives--;
+        died = false;
+    }
+
     // this is so enemies can't go through players
     else if (entityType == ENEMY) {
         CheckCollisionsY(player, 1); // Fix if needed
@@ -200,6 +223,61 @@ void Entity::Update(float deltaTime, Entity* player, Entity* platforms, Entity* 
 
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
+   
+    
+}
+
+void Entity::AIJumper() {
+    if (collidedBottom) {
+        jump = true;
+    }
+}
+
+void Entity::AIWaitAndGo(Entity* player) {
+    switch (aiState) {
+    case IDLE:
+        if (glm::distance(position, player->position) < 2.0f) {
+            aiState = WALKING;
+        }
+        break;
+    case WALKING:
+        if (player->isActive) {
+            movement = glm::vec3(-1, 0, 0);
+            break;
+        }
+    }
+}
+
+void Entity::AIChaser(Entity* player) {
+    switch (aiState) {
+    case CHASING:
+        if (player->isActive) {
+            if (player->position.x < position.x) {
+                movement = glm::vec3(-1, 0, 0);
+            }
+            else {
+                movement = glm::vec3(1, 0, 0);
+            }
+            break;
+        }
+    }
+}
+
+void Entity::AI(Entity* player) {
+    switch (aiType) {
+    case JUMPER:
+        AIJumper();
+        break;
+
+    case WAITANDGO:
+        AIWaitAndGo(player);
+        break;
+
+    case CHASER:
+        AIChaser(player);
+        break;
+
+    }
 }
 
 void Entity::DrawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID, int index)
