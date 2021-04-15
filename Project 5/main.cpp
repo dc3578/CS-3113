@@ -25,6 +25,7 @@
 //#define LIFE_COUNT 3
 #define LEVEL_COUNT 3
 #define TITLE "Jumper"
+#define INSTR "\"Kill and Touch Gray To Proceed\" "
 #define MENUTEXT "Press Enter To Play"
 //#define WIN "You Win!"
 //#define LOSE "You Lose!"
@@ -181,7 +182,8 @@ void Render() {
     // Display Menu while game not started
     if (!startgame) {
         Util::DrawText(&program, fontTextureID, TITLE, 0.5, -0.25, glm::vec3(-0.75, 0.5, 0));
-        Util::DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, 0, 0));
+        Util::DrawText(&program, fontTextureID, INSTR, 0.25, -0.125, glm::vec3(-2.0, 0, 0));
+        Util::DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, -0.5, 0));
     } 
     else {
         program.SetViewMatrix(viewMatrix);
