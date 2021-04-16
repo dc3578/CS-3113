@@ -11,7 +11,7 @@ unsigned int level1_data[] =
  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
- 2, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 3, 2,
+ 2, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 3, 2,
  2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2,
  2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
 };
@@ -21,9 +21,9 @@ void Level1::Initialize() {
     GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
     state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, level1_data, mapTextureID, 1.0f, 4, 1);
 	// Move over all of the player and enemy code from initialization.
+    InitMusic();
     InitPlayer();
     InitEnemies();
-    InitMusic();
 }
 
 void Level1::Update(float deltaTime) {
@@ -109,10 +109,9 @@ void Level1::InitEnemies() {
         state.enemies[i].acceleration = glm::vec3(0, -9.81, 0);
         state.enemies[i].entityType = ENEMY;
         state.enemies[i].width = 0.8f;
-        //state.enemies[i].height = 0.8f;
-        state.enemies[i].speed = 1.0f;
+        state.enemies[i].speed = 0.75f;
     }
-    state.enemies[0].position = glm::vec3(7, 4, 0);
+    state.enemies[0].position = glm::vec3(8, -4, 0);
     state.enemies[0].aiType = WAITANDGO;
     state.enemies[0].aiState = IDLE;
 }

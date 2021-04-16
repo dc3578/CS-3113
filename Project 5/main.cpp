@@ -21,14 +21,10 @@
 #include "Level2.h"
 #include "Level3.h"
 
-
-#define LIFE_COUNT 3
 #define LEVEL_COUNT 3
 #define TITLE "Jumper"
 #define INSTR "\"Kill and Touch Gray To Proceed\" "
 #define MENUTEXT "Press Enter To Play"
-//#define WIN "You Win!"
-//#define LOSE "You Lose!"
 
 ShaderProgram program;
 glm::mat4 viewMatrix, modelMatrix, projectionMatrix;
@@ -37,7 +33,6 @@ SDL_Window* displayWindow;
 bool gameIsRunning = true;
 bool startgame = false;
 GLuint fontTextureID;
-Mix_Chunk* jumpSound;
 
 Scene* currentScene;
 Scene* sceneList[LEVEL_COUNT];
@@ -75,7 +70,6 @@ void Initialize() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // get font texture ID
     fontTextureID = Util::LoadTexture("resources/font1.png");
-    jumpSound = Mix_LoadWAV("resources/jump.wav");
 
     // Init Levels
     sceneList[0] = new Level1();
@@ -100,7 +94,6 @@ void ProcessInput() {
                     case SDLK_SPACE:
                         if (currentScene->state.player->collidedBottom) {
                             currentScene->state.player->jump = true;
-                            Mix_PlayChannel(-1, jumpSound, 0);
                         }
                         break;
                     
@@ -183,7 +176,6 @@ void Render() {
     } 
     else {
         program.SetViewMatrix(viewMatrix);
-
         // render Scene 
         currentScene->Render(&program);
 

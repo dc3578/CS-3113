@@ -22,9 +22,9 @@ void Level2::Initialize() {
     GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
     state.map = new Map(LEVEL2_WIDTH, LEVEL2_HEIGHT, level2_data, mapTextureID, 1.0f, 4, 1);
     // Move over all of the player and enemy code from initialization.
+    InitMusic();
     InitPlayer();
     InitEnemies();
-    InitMusic();
 }
 
 void Level2::Update(float deltaTime) {

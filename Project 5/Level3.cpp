@@ -24,9 +24,9 @@ void Level3::Initialize() {
     GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
     state.map = new Map(LEVEL3_WIDTH, LEVEL3_HEIGHT, level3_data, mapTextureID, 1.0f, 4, 1);
     // Move over all of the player and enemy code from initialization.
+    InitMusic();
     InitPlayer();
     InitEnemies();
-    InitMusic();
 }
 
 void Level3::Update(float deltaTime) {
@@ -78,6 +78,7 @@ void Level3::Render(ShaderProgram* program) {
     if (win) {
         Util::DrawText(program, font_TID, "You Win!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
         Mix_HaltMusic();
+        state.gameover = true;
     }
 }
 
@@ -126,7 +127,6 @@ void Level3::InitEnemies() {
     state.enemies[0].position = glm::vec3(4, -2.5, 0);
     state.enemies[0].aiType = CHASER;
     state.enemies[0].aiState = CHASING;
-
 }
 
 void Level3::InitMusic() {
