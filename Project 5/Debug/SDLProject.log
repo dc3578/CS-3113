@@ -1,12 +1,4 @@
-﻿  Level1.cpp
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level1.cpp(38,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level1.cpp(58,132): warning C4305: 'argument': truncation from 'double' to 'float'
-  Level2.cpp
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level2.cpp(39,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level2.cpp(59,132): warning C4305: 'argument': truncation from 'double' to 'float'
-  Level3.cpp
+﻿  Level3.cpp
 C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level3.cpp(41,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level3.cpp(61,132): warning C4305: 'argument': truncation from 'double' to 'float'
-  main.cpp
-  Generating Code...
   SDLProject.vcxproj -> C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Debug\SDLProject.exe

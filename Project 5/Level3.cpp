@@ -2,19 +2,19 @@
 
 #define L3_ENEMY_COUNT 1
 
-#define LEVEL3_WIDTH 14
+#define LEVEL3_WIDTH 15
 #define LEVEL3_HEIGHT 8
 
 unsigned int level3_data[] =
 {
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
- 3, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
- 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
+ 2, 1, 1, 2, 0, 0, 2, 1, 1, 1, 1, 1, 1, 3, 2,
+ 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 bool win = false;
@@ -76,7 +76,7 @@ void Level3::Render(ShaderProgram* program) {
 
     // win condition
     if (win) {
-        Util::DrawText(program, font_TID, "You Win!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Util::DrawText(program, font_TID, "You Win!", 0.5, -0.25, glm::vec3(9.0, -2.5, 0));
         Mix_HaltMusic();
         state.gameover = true;
     }
@@ -92,7 +92,7 @@ void Level3::InitPlayer() {
     state.player->textureID = Util::LoadTexture("resources/george_0.png");
 
     state.player->speed = 2.0;
-    state.player->jumpPower = 6.0f;
+    state.player->jumpPower = 5.5f;
     state.player->jumpSound = Mix_LoadWAV("resources/jump.wav");
 
     state.player->animRight = new int[4]{ 3, 7, 11, 15 };
@@ -120,11 +120,11 @@ void Level3::InitEnemies() {
         state.enemies[i].acceleration = glm::vec3(0, -9.81, 0);
         state.enemies[i].width = 0.7f;
         state.enemies[i].entityType = ENEMY;
-        state.enemies[i].speed = 0.75f;
+        state.enemies[i].speed = 0.7f;
     }
 
     // spawn on ground floor
-    state.enemies[0].position = glm::vec3(4, -2.5, 0);
+    state.enemies[0].position = glm::vec3(13, -5, 0);
     state.enemies[0].aiType = CHASER;
     state.enemies[0].aiState = CHASING;
 }

@@ -82,7 +82,7 @@ void Level1::InitPlayer() {
     state.player->textureID = Util::LoadTexture("resources/george_0.png");
 
     state.player->speed = 2.0;
-    state.player->jumpPower = 6.0f;
+    state.player->jumpPower = 5.5f;
     state.player->jumpSound = Mix_LoadWAV("resources/jump.wav");
 
     state.player->animRight = new int[4]{ 3, 7, 11, 15 };
