@@ -34,7 +34,7 @@ void Level1::Update(float deltaTime) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
     }
 
-    // move to next level after killing all enemies and landing on a tile
+    // move to next level after killing all enemies and landing on gray tile
     int loc = LEVEL1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
     if (state.player->kills == L1_ENEMY_COUNT && level1_data[loc] == 3) {
         state.nextScene = 1;
@@ -61,6 +61,7 @@ void Level1::Render(ShaderProgram* program) {
     if (state.player->lives <= 0) {
         Util::DrawText(program, font_TID, "You Lose!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
         Mix_HaltMusic();
+        state.gameover = true;
         
         //stop all enemy movement
         for (int i = 0; i < L1_ENEMY_COUNT; i++) {
@@ -99,7 +100,6 @@ void Level1::InitPlayer() {
     state.player->width = 0.8f;
 }
 
-
 void Level1::InitEnemies() {
     state.enemies = new Entity[L1_ENEMY_COUNT];
     GLuint enemy_TID = Util::LoadTexture("resources/ken.png");
@@ -120,5 +120,5 @@ void Level1::InitEnemies() {
 void Level1::InitMusic() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     state.music = Mix_LoadMUS("resources/wholesome.mp3");
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 3);
 }

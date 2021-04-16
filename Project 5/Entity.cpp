@@ -236,7 +236,7 @@ void Entity::AIJumper() {
 void Entity::AIWaitAndGo(Entity* player) {
     switch (aiState) {
     case IDLE:
-        if (glm::distance(position, player->position) < 2.0f) {
+        if (glm::distance(position, player->position) < 5.0f) {
             aiState = WALKING;
         }
         break;

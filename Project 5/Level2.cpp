@@ -2,19 +2,19 @@
 
 #define L2_ENEMY_COUNT 1
 
-#define LEVEL2_WIDTH 14
+#define LEVEL2_WIDTH 16
 #define LEVEL2_HEIGHT 8
 
 unsigned int level2_data[] =
 {
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
- 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
- 3, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 3, 3, 3,
- 3, 1, 1, 0, 2, 2, 2, 0, 0, 0, 0, 3, 3, 3,
- 3, 2, 2, 0, 2, 2, 2, 0, 0, 0, 0, 3, 3, 3
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+ 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0,
+ 2, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 2, 0, 0, 1, 3,
+ 2, 1, 1, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 2,
+ 2, 2, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 2
 };
 
 void Level2::Initialize() {
@@ -29,8 +29,17 @@ void Level2::Initialize() {
 
 void Level2::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, L2_ENEMY_COUNT, state.map);
-    if (state.player->kills == L2_ENEMY_COUNT) {
+
+    // update enemies 
+    for (int i = 0; i < L2_ENEMY_COUNT; i++) {
+        state.enemies[i].Update(deltaTime, state.player, state.enemies, L2_ENEMY_COUNT, state.map);
+    }
+
+    // move to next level after killing all enemies and landing on a gray
+    int loc = LEVEL2_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
+    if (state.player->kills == L2_ENEMY_COUNT && level2_data[loc] == 3) {
         state.nextScene = 2;
+        state.player->kills = 0;
     }
 }
 
@@ -38,11 +47,30 @@ void Level2::Render(ShaderProgram* program) {
     state.map->Render(program);
     state.player->Render(program);
 
+    // render enemies 
+    for (int i = 0; i < L2_ENEMY_COUNT; i++) {
+        state.enemies[i].Render(program);
+    }
+
     // render lives
     float x = state.player->position.x;
     float y = state.player->position.y;
     GLuint font_TID = Util::LoadTexture("resources/font1.png");
     Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25, -0.15, glm::vec3(x - 0.25, y + 0.5, 0));
+
+    // lose condition
+    if (state.player->lives <= 0) {
+        Util::DrawText(program, font_TID, "You Lose!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Mix_HaltMusic();
+        state.gameover = true;
+
+        //stop all enemy movement
+        for (int i = 0; i < L2_ENEMY_COUNT; i++) {
+            state.enemies[i].acceleration = glm::vec3(0);
+            state.enemies[i].velocity = glm::vec3(0);
+            state.enemies[i].movement = glm::vec3(0);
+        }
+    }
 }
 
 void Level2::InitPlayer() {
@@ -83,18 +111,16 @@ void Level2::InitEnemies() {
         state.enemies[i].width = 0.7f;
         state.enemies[i].entityType = ENEMY;
         state.enemies[i].speed = 1.0f;
-        state.enemies[i].isActive = false;
     }
 
     // Jumping AI
-    state.enemies[0].position = glm::vec3(10, -4, 0);
+    state.enemies[0].position = glm::vec3(14, -4, 0);
     state.enemies[0].aiType = JUMPER;
-    state.enemies[0].jumpPower = 6.0f;
-
+    state.enemies[0].jumpPower = 7.0f;
 }
 
 void Level2::InitMusic() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     state.music = Mix_LoadMUS("resources/wholesome.mp3");
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 3);
 }

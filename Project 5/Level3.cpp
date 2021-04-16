@@ -17,6 +17,8 @@ unsigned int level3_data[] =
  3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
+bool win = false;
+
 void Level3::Initialize() {
     state.nextScene = -1;
     GLuint mapTextureID = Util::LoadTexture("resources/tileset.png");
@@ -29,8 +31,17 @@ void Level3::Initialize() {
 
 void Level3::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, L3_ENEMY_COUNT, state.map);
-    if (state.player->kills == L3_ENEMY_COUNT) {
-        state.nextScene = 4;
+
+    // update enemies 
+    for (int i = 0; i < L3_ENEMY_COUNT; i++) {
+        state.enemies[i].Update(deltaTime, state.player, state.enemies, L3_ENEMY_COUNT, state.map);
+    }
+
+    // move to next level after killing all enemies and landing on a gray
+    int loc = LEVEL3_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
+    if (state.player->kills == L3_ENEMY_COUNT && level3_data[loc] == 3) {
+        state.player->kills = 0;
+        win = true;
     }
 }
 
@@ -38,19 +49,44 @@ void Level3::Render(ShaderProgram* program) {
     state.map->Render(program);
     state.player->Render(program);
 
+    // render enemies 
+    for (int i = 0; i < L3_ENEMY_COUNT; i++) {
+        state.enemies[i].Render(program);
+    }
+
     // render lives
     float x = state.player->position.x;
     float y = state.player->position.y;
     GLuint font_TID = Util::LoadTexture("resources/font1.png");
     Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25, -0.15, glm::vec3(x - 0.25, y + 0.5, 0));
+
+    // lose condition
+    if (state.player->lives <= 0) {
+        Util::DrawText(program, font_TID, "You Lose!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Mix_HaltMusic();
+        state.gameover = true;
+
+        //stop all enemy movement
+        for (int i = 0; i < L3_ENEMY_COUNT; i++) {
+            state.enemies[i].acceleration = glm::vec3(0);
+            state.enemies[i].velocity = glm::vec3(0);
+            state.enemies[i].movement = glm::vec3(0);
+        }
+    }
+
+    // win condition
+    if (win) {
+        Util::DrawText(program, font_TID, "You Win!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Mix_HaltMusic();
+    }
 }
 
 void Level3::InitPlayer() {
     state.player = new Entity();
     state.player->entityType = PLAYER;
 
-    state.player->position = glm::vec3(5, 0, 0);
-    state.player->savedPoint = glm::vec3(5, 0, 0);
+    state.player->position = glm::vec3(1, -3, 0);
+    state.player->savedPoint = glm::vec3(1, -3, 0);
     state.player->acceleration = glm::vec3(0, -9.81, 0);
     state.player->textureID = Util::LoadTexture("resources/george_0.png");
 
@@ -84,26 +120,17 @@ void Level3::InitEnemies() {
         state.enemies[i].width = 0.7f;
         state.enemies[i].entityType = ENEMY;
         state.enemies[i].speed = 0.75f;
-        state.enemies[i].isActive = false;
     }
 
-    // spawn on first jump platform
-    state.enemies[0].position = glm::vec3(-1.5, -1.5, 0);
-    state.enemies[0].aiType = WAITANDGO;
-    state.enemies[0].aiState = IDLE;
-    // spawn on second jump platform
-    state.enemies[1].position = glm::vec3(2.5, -0.5, 0);
-    state.enemies[1].aiType = JUMPER;
-    state.enemies[1].jumpPower = 3.0f;
     // spawn on ground floor
-    state.enemies[2].position = glm::vec3(4, -2.5, 0);
-    state.enemies[2].aiType = CHASER;
-    state.enemies[2].aiState = CHASING;
+    state.enemies[0].position = glm::vec3(4, -2.5, 0);
+    state.enemies[0].aiType = CHASER;
+    state.enemies[0].aiState = CHASING;
 
 }
 
 void Level3::InitMusic() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     state.music = Mix_LoadMUS("resources/wholesome.mp3");
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 3);
 }

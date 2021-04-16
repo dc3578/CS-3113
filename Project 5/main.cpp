@@ -22,7 +22,7 @@
 #include "Level3.h"
 
 
-//#define LIFE_COUNT 3
+#define LIFE_COUNT 3
 #define LEVEL_COUNT 3
 #define TITLE "Jumper"
 #define INSTR "\"Kill and Touch Gray To Proceed\" "
@@ -36,8 +36,8 @@ glm::mat4 viewMatrix, modelMatrix, projectionMatrix;
 SDL_Window* displayWindow;
 bool gameIsRunning = true;
 bool startgame = false;
-bool gameover = false;
 GLuint fontTextureID;
+Mix_Chunk* jumpSound;
 
 Scene* currentScene;
 Scene* sceneList[LEVEL_COUNT];
@@ -75,6 +75,7 @@ void Initialize() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // get font texture ID
     fontTextureID = Util::LoadTexture("resources/font1.png");
+    jumpSound = Mix_LoadWAV("resources/jump.wav");
 
     // Init Levels
     sceneList[0] = new Level1();
@@ -99,6 +100,7 @@ void ProcessInput() {
                     case SDLK_SPACE:
                         if (currentScene->state.player->collidedBottom) {
                             currentScene->state.player->jump = true;
+                            Mix_PlayChannel(-1, jumpSound, 0);
                         }
                         break;
                     
@@ -115,7 +117,7 @@ void ProcessInput() {
     const Uint8* keys = SDL_GetKeyboardState(NULL);
     // only process input when game starts
     if (startgame) {
-        if (!gameover) {
+        if (!currentScene->state.gameover) {
             const Uint8* keys = SDL_GetKeyboardState(NULL);
             if (keys[SDL_SCANCODE_LEFT]) {
                 currentScene->state.player->movement.x = -1.0f;
@@ -133,12 +135,6 @@ void ProcessInput() {
         // stop all movement and accelleration once game is over
         else {
             currentScene->state.player->isActive = false;
-            // stop all enemy movement
-           /* for (int i = 0; i < ENEMY_COUNT; i++) {
-                state.enemies[i].acceleration = glm::vec3(0);
-                state.enemies[i].velocity = glm::vec3(0);
-                state.enemies[i].movement = glm::vec3(0);
-            }*/
         }
     }
 }
@@ -191,43 +187,21 @@ void Render() {
         // render Scene 
         currentScene->Render(&program);
 
-        //// render win/lose message
-        //if (currentScene->state.player->lives <= 0) {
-        //    Util::DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-        //    gameover = true;
-        //}
-        //if (currentScene->state.nextScene == 3) {
-        //    Util::DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-        //    gameover = true;
-        //}
-
-        if (gameover) {
+        if (currentScene->state.gameover) {
             Mix_HaltMusic();
         }
-        //else {
-        //    /*Util::DrawText(&program, fontTextureID, "Lives: " + std::to_string(state.player->lives), 0.5, -0.25, glm::vec3(-4.75f, 3.3, 0));*/
-        //}
-
-        //// render lives
-        //for (int i = 0; i < LIFE_COUNT; i++) {
-        //    state.lives[i].Render(&program);
-        //}
-
-        // Render message if you win
-        //if (currentScene->state.player->kills == ENEMY_COUNT) {
-        //    Util::DrawText(&program, fontTextureID, WIN, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-        //    gameover = true;
-        //}
-        //// Render message if you lose
-        //if (currentScene->state.player->deaths == LIFE_COUNT) {
-        //    Util::DrawText(&program, fontTextureID, LOSE, 0.5, -0.25, glm::vec3(-4.0, 3.25, 0));
-        //    gameover = true;
-        //}
     }
 
     SDL_GL_SwapWindow(displayWindow);
 }
 
+void UpdateScene() {
+    if (currentScene->state.nextScene >= 0) {
+        int curr_lives = currentScene->state.player->lives;
+        SwitchToScene(sceneList[currentScene->state.nextScene]);
+        currentScene->state.player->lives = curr_lives;
+    }
+}
 
 void Shutdown() {
     Mix_FreeChunk(currentScene->state.player->jumpSound);
@@ -235,15 +209,14 @@ void Shutdown() {
     SDL_Quit();
 }
 
+
 int main(int argc, char* argv[]) {
     Initialize();
 
     while (gameIsRunning) {
         ProcessInput();
         Update();
-
-        if (currentScene->state.nextScene >= 0) SwitchToScene(sceneList[currentScene->state.nextScene]);
-        
+        UpdateScene();
         Render();
     }
 

@@ -1,2 +1,4 @@
-﻿  main.cpp
+﻿  Level2.cpp
+C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level2.cpp(39,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Level2.cpp(59,132): warning C4305: 'argument': truncation from 'double' to 'float'
   SDLProject.vcxproj -> C:\Users\David\Desktop\Personal Projects\CS3113\Project 5\Debug\SDLProject.exe
