@@ -38,7 +38,7 @@ void Level3::Update(float deltaTime) {
     }
 
     // move to next level after killing all enemies and landing on a gray
-    int loc = LEVEL3_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
+    int loc = int(LEVEL3_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x));
     if (state.player->kills == L3_ENEMY_COUNT && level3_data[loc] == 3) {
         state.player->kills = 0;
         win = true;
@@ -55,14 +55,14 @@ void Level3::Render(ShaderProgram* program) {
     }
 
     // render lives
-    float x = state.player->position.x;
-    float y = state.player->position.y;
+    float x = state.player->position.x - 0.25f;
+    float y = state.player->position.y + 0.5f;
     GLuint font_TID = Util::LoadTexture("resources/font1.png");
-    Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25, -0.15, glm::vec3(x - 0.25, y + 0.5, 0));
+    Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25f, -0.15f, glm::vec3(x, y, 0));
 
     // lose condition
     if (state.player->lives <= 0) {
-        Util::DrawText(program, font_TID, "You Lose!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Util::DrawText(program, font_TID, "You Lose!", 0.5f, -0.25f, glm::vec3(4.5, -2.5, 0));
         Mix_HaltMusic();
         state.gameover = true;
 
@@ -76,7 +76,7 @@ void Level3::Render(ShaderProgram* program) {
 
     // win condition
     if (win) {
-        Util::DrawText(program, font_TID, "You Win!", 0.5, -0.25, glm::vec3(9.0, -2.5, 0));
+        Util::DrawText(program, font_TID, "You Win!", 0.5f, -0.25f, glm::vec3(9.0, -2.5, 0));
         Mix_HaltMusic();
         state.gameover = true;
     }
@@ -86,8 +86,8 @@ void Level3::InitPlayer() {
     state.player = new Entity();
     state.player->entityType = PLAYER;
 
-    state.player->position = glm::vec3(1, -3, 0);
-    state.player->savedPoint = glm::vec3(1, -3, 0);
+    state.player->position = glm::vec3(1, -5, 0);
+    state.player->savedPoint = glm::vec3(1, -5, 0);
     state.player->acceleration = glm::vec3(0, -9.81, 0);
     state.player->textureID = Util::LoadTexture("resources/george_0.png");
 

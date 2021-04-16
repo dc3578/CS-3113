@@ -35,7 +35,7 @@ void Level1::Update(float deltaTime) {
     }
 
     // move to next level after killing all enemies and landing on gray tile
-    int loc = LEVEL1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x);
+    int loc = int(LEVEL1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x));
     if (state.player->kills == L1_ENEMY_COUNT && level1_data[loc] == 3) {
         state.nextScene = 1;
         state.player->kills = 0;
@@ -52,14 +52,14 @@ void Level1::Render(ShaderProgram* program) {
     }
 
     // render lives
-    float x = state.player->position.x;
-    float y = state.player->position.y;
+    float x = state.player->position.x - 0.25f;
+    float y = state.player->position.y + 0.5f;
     GLuint font_TID = Util::LoadTexture("resources/font1.png");
-    Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25, -0.15, glm::vec3(x - 0.25, y + 0.5, 0));
+    Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25f, -0.15f, glm::vec3(x, y, 0));
 
     // lose condition
     if (state.player->lives <= 0) {
-        Util::DrawText(program, font_TID, "You Lose!", 0.5, -0.25, glm::vec3(4.5, -2.5, 0));
+        Util::DrawText(program, font_TID, "You Lose!", 0.5f, -0.25f, glm::vec3(4.5, -2.5, 0));
         Mix_HaltMusic();
         state.gameover = true;
         
@@ -76,8 +76,8 @@ void Level1::InitPlayer() {
     state.player = new Entity();
     state.player->entityType = PLAYER;
 
-    state.player->position = glm::vec3(1, -3, 0);
-    state.player->savedPoint = glm::vec3(1, -3, 0);
+    state.player->position = glm::vec3(1, -5, 0);
+    state.player->savedPoint = glm::vec3(1, -5, 0);
     state.player->acceleration = glm::vec3(0, -9.81, 0);
     state.player->textureID = Util::LoadTexture("resources/george_0.png");
 
@@ -109,7 +109,7 @@ void Level1::InitEnemies() {
         state.enemies[i].acceleration = glm::vec3(0, -9.81, 0);
         state.enemies[i].entityType = ENEMY;
         state.enemies[i].width = 0.8f;
-        state.enemies[i].speed = 0.75f;
+        state.enemies[i].speed = 0.7f;
     }
     state.enemies[0].position = glm::vec3(8, -4, 0);
     state.enemies[0].aiType = WAITANDGO;
