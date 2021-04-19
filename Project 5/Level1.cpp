@@ -34,11 +34,10 @@ void Level1::Update(float deltaTime) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
     }
 
-    // move to next level after killing all enemies and landing on gray tile
+    // move to next level after passing the gray tile
     int loc = int(LEVEL1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x));
-    if (state.player->kills == L1_ENEMY_COUNT && level1_data[loc] == 3) {
+    if (level1_data[loc] == 3) {
         state.nextScene = 1;
-        state.player->kills = 0;
     }
 }
 
