@@ -123,7 +123,7 @@ void Level3::InitEnemies() {
         state.enemies[i].speed = 0.7f;
     }
 
-    // spawn on ground floor
+    // AI chases player
     state.enemies[0].position = glm::vec3(13, -5, 0);
     state.enemies[0].aiType = CHASER;
     state.enemies[0].aiState = CHASING;

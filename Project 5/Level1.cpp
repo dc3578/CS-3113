@@ -110,6 +110,7 @@ void Level1::InitEnemies() {
         state.enemies[i].width = 0.8f;
         state.enemies[i].speed = 0.7f;
     }
+    // Wait and Go AI
     state.enemies[0].position = glm::vec3(8, -4, 0);
     state.enemies[0].aiType = WAITANDGO;
     state.enemies[0].aiState = IDLE;
