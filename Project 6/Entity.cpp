@@ -214,7 +214,7 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
 
         if (hitCoin) {
             coins++;
-            Mix_PlayChannel(-1, lastCollision->sfx, 0);
+            Mix_PlayChannel(-1, sfx, 0);
             hitCoin = false;
         }
         // update hit enemy flags after hitting enemy
@@ -272,7 +272,7 @@ void Entity::AIPatroller(Entity* player) {
 void Entity::AIWaitAndGo(Entity* player) {
     switch (aiState) {
     case IDLE:
-        if (glm::distance(position, player->position) < 4.0f) {
+        if (glm::distance(position, player->position) < 2.0f) {
             aiState = WALKING;
         }
         break;

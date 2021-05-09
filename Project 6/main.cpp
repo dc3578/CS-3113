@@ -185,7 +185,7 @@ void Update() {
             view_y = -currentScene->state.player->position.y;
         }
         else if (ypos > -5) {
-            view_y = 4;
+            view_y = 3.75;
         }
         else if (ypos < -20) {
             view_y = 20;
@@ -219,6 +219,7 @@ void Render() {
 }
 
 void Shutdown() {
+    Mix_FreeChunk(currentScene->state.player->bumpSound);
     Mix_FreeChunk(currentScene->state.player->sfx);
     Mix_FreeMusic(currentScene->state.music);
     SDL_Quit();

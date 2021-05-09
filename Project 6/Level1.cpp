@@ -2,43 +2,43 @@
 #include <vector>
 
 #define L1_ENEMY_COUNT 12
-#define L1_COIN_COUNT 15
-
-//exit at 7,-3
+#define L1_COIN_COUNT 20
 #define L1_WIDTH 25
 #define L1_HEIGHT 25
-unsigned int b = 86;
-unsigned int w = 87;
-unsigned int s = 39;
+
+unsigned int e = 39; // exit tile
+unsigned int b = 86; // border tile 
+unsigned int w = 87; // wall tile
+unsigned int f = 89; // floor tile
+
 unsigned int level1_data[] =
 {
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
-    b, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, 0, w, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, w, w, w, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, s, 0, w, 0, w, w, 0, 0, 0, 0, w, w, 0, 0, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, w, w, w, w, w, 0, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, 0, w, w, 0, w, 0, 0, 0, 0, 0, 0, w, 0, w, 0, b,
-    b, w, 0, w, w, w, w, w, 0, w, 0, w, 0, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, b,
-    b, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, 0, w, w, w, 0, w, w, w, 0, 0, 0, 0, b,
-    b, w, w, w, 0, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, b,
-    b, w, w, w, 0, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, w, w, w, 0, b,
-    b, w, w, w, w, w, w, w, w, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, b,
-    b, 0, 0, 0, 0, 0, 0, 0, 0, w, 0, w, w, w, 0, w, 0, 0, 0, w, 0, w, w, w, b,
-    b, 0, w, w, w, w, 0, 0, 0, w, 0, w, 0, w, 0, 0, 0, 0, 0, w, 0, w, w, w, b,
-    b, 0, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, w, w, w, w, w, w, w, 0, 0, 0, 0, b,
-    b, 0, w, w, w, w, w, w, w, w, w, w, 0, w, w, w, w, w, w, w, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, 0, w, w, w, 0, 0, 0, w, 0, 0, 0, 0, w, w, 0, 0, 0, 0, b,
-    b, 0, w, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, w, w, w, w, w, 0, w, w, 0, b,
-    b, 0, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, 0, 0, 0, w, w, w, b,
-    b, 0, w, w, w, 0, w, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
-    b, 0, w, w, 0, w, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
-    b, 0, 0, 0, 0, w, w, w, w, 0, w, w, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
-    b, 0, 0, w, 0, w, w, w, w, 0, w, w, w, w, w, w, w, w, 0, w, 0, w, w, w, b,
-    b, 0, 0, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, w, w, b,
+    b, w, w, w, w, f, f, f, f, f, f, f, f, f, w, f, f, f, f, f, f, f, f, f, b,
+    b, f, f, f, f, f, w, w, w, w, w, f, f, f, w, f, f, f, f, f, f, f, w, f, b,
+    b, f, f, f, f, f, w, w, f, e, f, w, f, w, w, f, f, f, f, w, w, f, f, f, b,
+    b, f, f, f, f, f, w, w, f, w, f, w, f, w, w, w, w, w, w, f, w, w, w, f, b,
+    b, f, f, f, f, f, w, w, f, w, f, w, f, w, w, f, f, f, f, f, f, f, w, f, b,
+    b, f, f, f, f, f, w, w, f, f, w, w, f, w, f, f, f, f, f, f, w, f, w, f, b,
+    b, w, f, w, w, w, w, w, f, w, f, w, f, w, f, f, f, f, f, f, w, f, f, f, b,
+    b, w, f, f, f, f, f, f, f, f, f, w, f, w, w, w, f, w, w, w, f, f, f, f, b,
+    b, w, w, f, f, f, f, f, f, w, f, w, f, f, f, w, f, f, f, w, f, f, f, f, b,
+    b, w, w, w, f, f, f, f, f, w, f, w, f, f, f, w, f, f, f, w, w, w, w, f, b,
+    b, f, w, w, w, w, w, w, w, w, f, w, f, f, f, w, f, f, f, w, f, f, f, f, b,
+    b, f, f, f, f, f, f, f, f, w, f, w, w, w, f, w, f, f, f, w, f, w, w, w, b,
+    b, f, w, w, f, w, f, f, f, w, f, w, f, w, f, f, f, f, f, w, f, w, w, w, b,
+    b, f, w, w, f, w, f, f, f, f, f, f, f, w, w, w, w, w, w, w, f, f, f, f, b,
+    b, f, w, w, f, w, w, w, w, w, w, w, f, w, w, f, f, f, w, w, w, w, w, f, b,
+    b, f, f, f, f, f, f, w, w, w, f, f, f, w, f, f, f, f, w, w, f, f, f, f, b,
+    b, f, w, f, f, f, f, w, f, w, f, f, f, w, f, w, w, w, w, w, f, w, w, f, b,
+    b, f, w, f, f, f, f, f, f, w, f, f, f, w, f, f, f, f, f, f, f, f, w, w, b,
+    b, f, w, w, w, f, w, w, f, w, f, f, f, w, f, f, f, w, w, w, f, w, w, f, b,
+    b, f, w, w, f, w, w, w, f, f, f, f, f, w, f, f, f, w, w, w, w, w, f, f, b,
+    b, f, f, f, f, w, w, w, w, f, w, w, w, f, f, f, f, f, f, w, f, f, f, f, b,
+    b, f, f, w, f, w, w, w, w, f, w, w, w, w, w, w, w, w, f, w, f, w, w, w, b,
+    b, f, f, w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w, w, w, b,
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
 };
-
 
 GLuint font_TID;
 GLuint tilesetID;
@@ -47,6 +47,41 @@ bool lose = false;
 std::string message;
 std::vector<glm::vec3> enemyCords;
 std::vector<glm::vec3> coinCords;
+
+void Level1::CreateCoinCords() {
+    coinCords.push_back(glm::vec3(3, -4, 0));
+    coinCords.push_back(glm::vec3(3, -17, 0));
+    coinCords.push_back(glm::vec3(4, -21, 0));
+    coinCords.push_back(glm::vec3(5, -9, 0));
+    coinCords.push_back(glm::vec3(10, -16, 0));
+    coinCords.push_back(glm::vec3(13, -21, 0));
+    coinCords.push_back(glm::vec3(15, -1, 0));
+    coinCords.push_back(glm::vec3(17, -10, 0));
+    coinCords.push_back(glm::vec3(19, -4, 0));
+    coinCords.push_back(glm::vec3(23, -19, 0));
+    coinCords.push_back(glm::vec3(14, -6, 0));
+    coinCords.push_back(glm::vec3(9, -22, 0));
+    coinCords.push_back(glm::vec3(14, -11, 0));
+    coinCords.push_back(glm::vec3(15, -3, 0));
+    coinCords.push_back(glm::vec3(18, -3, 0));
+
+    coinCords.push_back(glm::vec3(8, -17, 0));
+    coinCords.push_back(glm::vec3(23, -1, 0));
+    coinCords.push_back(glm::vec3(13, -1, 0));
+    coinCords.push_back(glm::vec3(17, -16, 0));
+    coinCords.push_back(glm::vec3(5, -1, 0));
+}
+
+void Level1::CreateEnemyCords() {
+    enemyCords.push_back(glm::vec3(7, -12, 0));
+    enemyCords.push_back(glm::vec3(11, -18, 0));
+    enemyCords.push_back(glm::vec3(6, -9, 0));
+    enemyCords.push_back(glm::vec3(16, -6, 0));
+    enemyCords.push_back(glm::vec3(14, -19, 0));
+    enemyCords.push_back(glm::vec3(4, -17, 0));
+    enemyCords.push_back(glm::vec3(13, -10, 0));
+    enemyCords.push_back(glm::vec3(17, -11, 0));
+}
 
 void Level1::Initialize() {
     tilesetID = Util::LoadTexture("resources/sokoban_tilesheet.png");
@@ -74,7 +109,7 @@ void Level1::Update(float deltaTime) {
     }
 
     int loc = int(L1_WIDTH * ceil(-state.player->position.y) + floor(state.player->position.x));
-    if (level1_data[loc] == s && state.player->coins == L1_COIN_COUNT) {
+    if (level1_data[loc] == e && state.player->coins == L1_COIN_COUNT) {
         win = true;
     }
     if (state.player->lives <= 0) {
@@ -135,15 +170,18 @@ void Level1::InitPlayer() {
     state.player->position = glm::vec3(1, -23, 0);
     state.player->savedPoint = glm::vec3(1, -23, 0);
     state.player->textureID = Util::LoadTexture("resources/assets/player.png");
+    state.player->sfx = Mix_LoadWAV("resources/sounds/coin.wav");
     state.player->bumpSound = Mix_LoadWAV("resources/sounds/bump.wav");
-    Mix_VolumeChunk(state.player->bumpSound, MIX_MAX_VOLUME / 5);
+    Mix_VolumeChunk(state.player->bumpSound, MIX_MAX_VOLUME / 10);
+    Mix_VolumeChunk(state.player->sfx, MIX_MAX_VOLUME / 10);
+    
 
     state.player->minMapHeight = -L1_HEIGHT;
 
     state.player->speed = 2.0;
     state.player->width = 0.8f;
     state.player->height = 1.0f;
-
+    state.player->lives = 4;
 
     state.player->animRight = new int[4]{ 4, 3, 4, 5 };
     state.player->animLeft = new int[4]{ 10, 9, 10, 11 };
@@ -157,17 +195,6 @@ void Level1::InitPlayer() {
     state.player->animFrames = 4;
     state.player->animIndex = 0;
     state.player->animTime = 0;
-}
-
-void Level1::CreateEnemyCords() {
-    enemyCords.push_back(glm::vec3(7, -12, 0));
-    enemyCords.push_back(glm::vec3(11, -18, 0));
-    enemyCords.push_back(glm::vec3(6, -9, 0));
-    enemyCords.push_back(glm::vec3(16, -6, 0));
-    enemyCords.push_back(glm::vec3(14, -19, 0));
-    enemyCords.push_back(glm::vec3(4, -17, 0));
-    enemyCords.push_back(glm::vec3(13, -10, 0));
-    enemyCords.push_back(glm::vec3(17, -11, 0));
 }
 
 void Level1::InitEnemies() {
@@ -210,23 +237,7 @@ void Level1::InitEnemies() {
     state.enemies[11].aiState = XDIR;
 }
 
-void Level1::CreateCoinCords() {
-    coinCords.push_back(glm::vec3(3, -4, 0));
-    coinCords.push_back(glm::vec3(3, -17, 0));
-    coinCords.push_back(glm::vec3(4, -21, 0));
-    coinCords.push_back(glm::vec3(5, -9, 0));
-    coinCords.push_back(glm::vec3(10, -16, 0));
-    coinCords.push_back(glm::vec3(13, -21, 0));
-    coinCords.push_back(glm::vec3(15, -1, 0));
-    coinCords.push_back(glm::vec3(17, -10, 0));
-    coinCords.push_back(glm::vec3(19, -4, 0));
-    coinCords.push_back(glm::vec3(23, -19, 0));
-    coinCords.push_back(glm::vec3(14, -6, 0));
-    coinCords.push_back(glm::vec3(9, -22, 0));
-    coinCords.push_back(glm::vec3(14, -11, 0));
-    coinCords.push_back(glm::vec3(15, -3, 0));
-    coinCords.push_back(glm::vec3(18, -3, 0));
-}
+
 
 void Level1::InitCoins() {
     state.coins = new Entity[L1_COIN_COUNT];
@@ -236,7 +247,6 @@ void Level1::InitCoins() {
     for (int i = 0; i < L1_COIN_COUNT; i++) {
         state.coins[i].textureID = coin_TID;
         state.coins[i].entityType = COIN;
-        state.coins[i].sfx = Mix_LoadWAV("resources/sounds/coin.wav"); 
         state.coins[i].position = coinCords[i];
     }
 }
@@ -245,5 +255,5 @@ void Level1::InitCoins() {
 void Level1::InitMusic() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     state.music = Mix_LoadMUS("resources/sounds/SCP-x7x.mp3");
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 3);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
 }

@@ -33,7 +33,7 @@ public:
     float height = 1;
     
     int coins = 0;
-    int lives = 3;
+    int lives = 0;
     int minMapHeight = 0;
     bool died = false;
     Mix_Chunk* bumpSound;
