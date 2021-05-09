@@ -25,9 +25,8 @@ bool Entity::CheckCollision(Entity* other) {
         else if (entityType == COIN && other->entityType == PLAYER) {
             isActive = false;
             other->hitCoin = true;
-            other->coins++;
             other->lastCollision = this;
-        }
+        } 
         return true;
     }
     return false;
@@ -226,8 +225,7 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
         }
         else if (hitWall) {
             Mix_PlayChannel(-1, bumpSound, 0);
-            hitWall = false;
-            
+            hitWall = false; 
         }
 
         // restart at saved point when dead

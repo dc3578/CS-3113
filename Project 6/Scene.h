@@ -18,6 +18,7 @@ struct GameState {
 	Entity* player;
 	Entity* enemies;
 	Entity* coins;
+	Entity* exit;
 	Mix_Music* music;
 	int nextScene;
 	bool gameover = false;

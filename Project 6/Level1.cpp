@@ -8,14 +8,15 @@
 #define L1_HEIGHT 25
 unsigned int b = 86;
 unsigned int w = 87;
+unsigned int s = 39;
 unsigned int level1_data[] =
 {
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
     b, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, 0, w, w, 0, 0, 0, 0, 0, w, w, w, w, b,
-    b, 0, 0, 0, 0, 0, w, w, w, w, w, w, 0, w, w, 0, 0, 0, 0, 0, w, w, w, w, b,
-    b, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, b,
-    b, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, w, 0, w, w, w, w, w, w, w, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, w, w, 0, w, 0, w, 0, 0, 0, 0, 0, 0, w, w, w, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, w, w, w, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, w, b,
+    b, 0, 0, 0, 0, 0, w, w, 0, s, 0, w, 0, w, w, 0, 0, 0, 0, w, w, 0, 0, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, w, w, w, w, w, 0, w, w, w, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, 0, 0, 0, 0, 0, 0, w, w, w, 0, b,
     b, 0, 0, 0, 0, 0, w, w, 0, 0, 0, w, 0, w, 0, 0, 0, 0, 0, 0, w, w, w, 0, b,
     b, w, 0, w, w, w, w, w, 0, w, w, w, 0, w, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
     b, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, 0, w, w, w, 0, w, w, w, 0, 0, 0, 0, b,
@@ -31,14 +32,17 @@ unsigned int level1_data[] =
     b, 0, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, 0, 0, 0, 0, 0, 0, w, w, w, b,
     b, 0, w, w, w, 0, w, w, 0, w, 0, 0, 0, w, w, 0, 0, w, w, w, w, w, w, 0, b,
     b, 0, w, w, w, 0, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
-    b, 0, 0, 0, 0, w, w, w, w, w, w, w, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
-    b, 0, 0, w, 0, w, w, w, w, w, w, w, w, w, w, w, w, w, 0, w, 0, w, w, w, b,
+    b, 0, 0, 0, 0, w, w, w, w, 0, w, w, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
+    b, 0, 0, w, 0, w, w, w, w, 0, w, w, w, w, w, w, w, w, 0, w, 0, w, w, w, b,
     b, 0, 0, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, w, w, b,
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
 };
 
 GLuint font_TID;
 GLuint tilesetID;
+bool win = false;
+bool lose = false;
+std::string message;
 
 void Level1::Initialize() {
     tilesetID = Util::LoadTexture("resources/sokoban_tilesheet.png");
@@ -54,7 +58,6 @@ void Level1::Initialize() {
 
 void Level1::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
-    //state.player->Update(deltaTime, state.player, state.coins, L1_ENEMY_COUNT, state.map);
 
     // update enemies 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
@@ -66,16 +69,19 @@ void Level1::Update(float deltaTime) {
         state.coins[i].Update(deltaTime, state.player, state.coins, L1_COIN_COUNT, state.map);
     }
 
-    // move to next level after passing the gray tile
-    int loc = int(L1_WIDTH * floor(-state.player->position.y + 1) + floor(state.player->position.x));
-    if (level1_data[loc] == 3) {
-        state.nextScene = 1;
+    int loc = int(L1_WIDTH * ceil(-state.player->position.y) + floor(state.player->position.x));
+    if (level1_data[loc] == s && state.player->coins == L1_COIN_COUNT) {
+        win = true;
+    }
+    if (state.player->lives <= 0) {
+        lose = true;
     }
 }
 
 void Level1::Render(ShaderProgram* program) {
     state.map->Render(program);
     state.player->Render(program);
+    //state.exit->Render(program);
 
     // render enemies 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
@@ -90,18 +96,28 @@ void Level1::Render(ShaderProgram* program) {
     // render lives
     float x = state.player->position.x - 0.25f;
     float y = state.player->position.y + 0.5f;
-
     Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25f, -0.15f, glm::vec3(x, y, 0));
 
-    // lose condition
-    if (state.player->lives <= 0) {
-        Util::DrawText(program, font_TID, "You Lose!", 0.5f, -0.25f, glm::vec3(4.5, -2.5, 0));
+    // render coins left to collect
+    x = state.player->position.x - 0.5f;
+    y = state.player->position.y - 0.5f;
+    Util::DrawText(program, font_TID, "Coins Left: " + std::to_string(L1_COIN_COUNT - state.player->coins), 0.25f, -0.15f, glm::vec3(x, y, 0));
+    
+    if (win) {
+        message = "You Win!";
+    }
+    else if (lose) {
+        message = "You Lose!";
+    }
+    if (win || lose) {
+        float xpos = state.player->position.x - 1;
+        float ypos = state.player->position.y + 2;
+        Util::DrawText(program, font_TID, message, 0.5f, -0.25f, glm::vec3(xpos, ypos, 0));
         Mix_HaltMusic();
         state.gameover = true;
 
         //stop all enemy movement
         for (int i = 0; i < L1_ENEMY_COUNT; i++) {
-            state.enemies[i].acceleration = glm::vec3(0);
             state.enemies[i].velocity = glm::vec3(0);
             state.enemies[i].movement = glm::vec3(0);
         }
@@ -114,7 +130,6 @@ void Level1::InitPlayer() {
 
     state.player->position = glm::vec3(1, -23, 0);
     state.player->savedPoint = glm::vec3(1, -23, 0);
-    state.player->acceleration = glm::vec3(0, 0, 0);
     state.player->textureID = Util::LoadTexture("resources/assets/player.png");
     state.player->bumpSound = Mix_LoadWAV("resources/sounds/bump.wav");
     Mix_VolumeChunk(state.player->bumpSound, MIX_MAX_VOLUME / 5);
@@ -122,8 +137,8 @@ void Level1::InitPlayer() {
     state.player->minMapHeight = -L1_HEIGHT;
 
     state.player->speed = 2.0;
-    state.player->width = 0.8f;
-    state.player->height = 0.8f;
+    state.player->width = 0.85f;
+    state.player->height = 1.0f;
 
 
     state.player->animRight = new int[4]{ 4, 3, 4, 5 };
@@ -142,13 +157,12 @@ void Level1::InitPlayer() {
 
 void Level1::InitEnemies() {
     state.enemies = new Entity[L1_ENEMY_COUNT];
-    GLuint enemy_TID = Util::LoadTexture("resources/ken.png");
+    GLuint enemy_TID = Util::LoadTexture("resources/assets/enemy_walk.png");
 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
         state.enemies[i].textureID = enemy_TID;
-        state.enemies[i].acceleration = glm::vec3(0);
         state.enemies[i].entityType = ENEMY;
-        state.enemies[i].width = 0.8f;
+        //state.enemies[i].width = 0.8f;
         state.enemies[i].speed = 0.7f;
     }
     // Wait and Go AI
@@ -163,11 +177,10 @@ void Level1::InitCoins() {
 
     for (int i = 0; i < L1_COIN_COUNT; i++) {
         state.coins[i].textureID = coin_TID;
-        state.coins[i].acceleration = glm::vec3(0);
         state.coins[i].entityType = COIN;
         state.coins[i].sfx = Mix_LoadWAV("resources/sounds/coin.wav");
     }
-
+    // positions of the coins
     state.coins[0].position = glm::vec3(3, -4, 0);
     state.coins[1].position = glm::vec3(3, -17, 0);
     state.coins[2].position = glm::vec3(4, -21, 0);

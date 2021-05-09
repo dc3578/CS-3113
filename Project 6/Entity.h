@@ -14,7 +14,7 @@
 #include "Map.h"
 #include <SDL_mixer.h>
 
-enum EntityType {PLAYER, PLATFORM, ENEMY, COIN};
+enum EntityType {PLAYER, EXIT, ENEMY, COIN};
 enum AIType {WAITANDGO, CHASER, JUMPER, SPIKE};
 enum AIState {IDLE, WALKING, CHASING, JUMPING};
 
@@ -62,10 +62,12 @@ public:
     bool collidedBottom = false;
     bool collidedLeft = false;
     bool collidedRight = false;
+    
     bool hitEnemy = false;
     bool hitEnemyHead = false;
     bool hitWall = false;
     bool hitCoin = false;
+    
     Entity* lastCollision = NULL;
     Entity();
     

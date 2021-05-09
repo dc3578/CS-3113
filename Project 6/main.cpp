@@ -23,7 +23,7 @@
 
 #define LEVEL_COUNT 2
 #define TITLE "Basement Treasures"
-#define INSTR "\"Collect Coins And Find Exit\" "
+#define INSTR "\"Collect All Coins And Find Exit\" "
 #define MENUTEXT "Press Enter To Play"
 
 ShaderProgram program;
@@ -202,7 +202,7 @@ void Render() {
     // Display Menu while game not started
     if (!startgame) {
         Util::DrawText(&program, fontTextureID, TITLE, 0.5, -0.25, glm::vec3(-2.0, 0.5, 0));
-        Util::DrawText(&program, fontTextureID, INSTR, 0.25, -0.125, glm::vec3(-1.75, 0, 0));
+        Util::DrawText(&program, fontTextureID, INSTR, 0.25, -0.125, glm::vec3(-2.0, 0, 0));
         Util::DrawText(&program, fontTextureID, MENUTEXT, 0.5, -0.25, glm::vec3(-2.25, -0.5, 0));
     }
     else {
