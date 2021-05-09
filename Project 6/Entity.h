@@ -15,8 +15,8 @@
 #include <SDL_mixer.h>
 
 enum EntityType {PLAYER, EXIT, ENEMY, COIN};
-enum AIType {WAITANDGO, CHASER, JUMPER, SPIKE};
-enum AIState {IDLE, WALKING, CHASING, JUMPING};
+enum AIType {WAITANDGO, CHASER, SPIKE, PATROLER};
+enum AIState {IDLE, WALKING, CHASING, XDIR, YDIR};
 
 class Entity {
 public:
@@ -67,6 +67,7 @@ public:
     bool hitEnemyHead = false;
     bool hitWall = false;
     bool hitCoin = false;
+    int direction = 1;
     
     Entity* lastCollision = NULL;
     Entity();
@@ -82,7 +83,7 @@ public:
     void DrawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID, int index);
 
     void AI(Entity* player);
-    void AIJumper();
+    void AIPatroller(Entity* player);
     void AIWaitAndGo(Entity* player);
     void AIChaser(Entity* player);
 };

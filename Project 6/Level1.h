@@ -9,4 +9,6 @@ public:
 	void InitEnemies() override;
 	void InitMusic() override;
 	void InitCoins() override;
+	void CreateEnemyCords();
+	void CreateCoinCords();
 };

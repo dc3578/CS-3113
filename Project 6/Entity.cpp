@@ -50,9 +50,6 @@ void Entity::CheckCollisionsY(Entity* objects, int objectCount)
                 position.y += penetrationY;
                 velocity.y = 0;
                 collidedBottom = true;
-                if (entityType == PLAYER && object->entityType == ENEMY) {
-                    hitEnemyHead = true;
-                }
             }
         }
     }
@@ -100,36 +97,42 @@ void Entity::CheckCollisionsY(Map* map)
         velocity.y = 0;
         collidedTop = true;
         hitWall = true;
+        direction = -1;
     }
     else if (map->IsSolid(top_left, &penetration_x, &penetration_y) && velocity.y > 0) {
         position.y -= penetration_y;
         velocity.y = 0;
         collidedTop = true;
         hitWall = true;
+        direction = -1;
     }
     else if (map->IsSolid(top_right, &penetration_x, &penetration_y) && velocity.y > 0) {
         position.y -= penetration_y;
         velocity.y = 0;
         collidedTop = true;
         hitWall = true;
+        direction = -1;
     }
     if (map->IsSolid(bottom, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
         hitWall = true;
+        direction = 1;
     }
     else if (map->IsSolid(bottom_left, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
         hitWall = true;
+        direction = 1;
     }
     else if (map->IsSolid(bottom_right, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
         hitWall = true;
+        direction = 1;
     }
 }
 
@@ -146,6 +149,7 @@ void Entity::CheckCollisionsX(Map* map)
         velocity.x = 0;
         collidedLeft = true;
         hitWall = true;
+        direction = 1;
     }
 
     if (map->IsSolid(right, &penetration_x, &penetration_y) && velocity.x > 0) {
@@ -153,6 +157,7 @@ void Entity::CheckCollisionsX(Map* map)
         velocity.x = 0;
         collidedRight = true;
         hitWall = true;
+        direction = -1;
     }
 }
 
@@ -214,13 +219,7 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
         }
         // update hit enemy flags after hitting enemy
         else if (hitEnemy) {
-            if (hitEnemyHead) {
-                lastCollision->isActive = false;
-                hitEnemyHead = false;
-            }
-            else {
-                died = true;
-            }
+            died = true;
             hitEnemy = false;
         }
         else if (hitWall) {
@@ -245,16 +244,35 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
     modelMatrix = glm::translate(modelMatrix, position);
 }
 
-void Entity::AIJumper() {
-    if (collidedBottom) {
-        jump = true;
+void Entity::AIPatroller(Entity* player) {
+    if (player->isActive) {
+        switch (aiState) {
+        case YDIR:
+            if (direction >= 0) {
+                movement = glm::vec3(0, 1, 0);
+            }
+            else {
+                movement = glm::vec3(0, -1, 0);
+            }
+            break;
+
+        case XDIR:
+            if (direction >= 0) {
+                movement = glm::vec3(1, 0, 0);
+            }
+            else {
+                movement = glm::vec3(-1, 0, 0);
+            }
+            break;
+        }
     }
+    
 }
 
 void Entity::AIWaitAndGo(Entity* player) {
     switch (aiState) {
     case IDLE:
-        if (glm::distance(position, player->position) < 5.0f) {
+        if (glm::distance(position, player->position) < 4.0f) {
             aiState = WALKING;
         }
         break;
@@ -283,8 +301,8 @@ void Entity::AIChaser(Entity* player) {
 
 void Entity::AI(Entity* player) {
     switch (aiType) {
-    case JUMPER:
-        AIJumper();
+    case PATROLER:
+        AIPatroller(player);
         break;
 
     case WAITANDGO:

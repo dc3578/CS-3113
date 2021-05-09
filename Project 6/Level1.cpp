@@ -1,7 +1,8 @@
 #include "Level1.h"
+#include <vector>
 
-#define L1_ENEMY_COUNT 1
-#define L1_COIN_COUNT 10
+#define L1_ENEMY_COUNT 12
+#define L1_COIN_COUNT 15
 
 //exit at 7,-3
 #define L1_WIDTH 25
@@ -12,37 +13,40 @@ unsigned int s = 39;
 unsigned int level1_data[] =
 {
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
-    b, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, 0, w, w, 0, 0, 0, 0, 0, w, w, w, w, b,
-    b, 0, 0, 0, 0, 0, w, w, w, w, w, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, w, b,
+    b, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, 0, w, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, w, w, w, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, 0, b,
     b, 0, 0, 0, 0, 0, w, w, 0, s, 0, w, 0, w, w, 0, 0, 0, 0, w, w, 0, 0, 0, b,
     b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, w, w, w, w, w, 0, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, 0, 0, 0, 0, 0, 0, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, 0, 0, 0, w, 0, w, 0, 0, 0, 0, 0, 0, w, w, w, 0, b,
-    b, w, 0, w, w, w, w, w, 0, w, w, w, 0, w, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, 0, w, 0, w, 0, w, w, 0, 0, 0, 0, 0, 0, 0, w, 0, b,
+    b, 0, 0, 0, 0, 0, w, w, 0, 0, w, w, 0, w, 0, 0, 0, 0, 0, 0, w, 0, w, 0, b,
+    b, w, 0, w, w, w, w, w, 0, w, 0, w, 0, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, b,
     b, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, 0, w, w, w, 0, w, w, w, 0, 0, 0, 0, b,
     b, w, w, w, 0, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, b,
     b, w, w, w, 0, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, w, w, w, 0, b,
     b, w, w, w, w, w, w, w, w, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, b,
     b, 0, 0, 0, 0, 0, 0, 0, 0, w, 0, w, w, w, 0, w, 0, 0, 0, w, 0, w, w, w, b,
-    b, 0, w, w, w, w, 0, 0, 0, w, 0, w, w, w, 0, 0, 0, 0, 0, w, 0, w, w, w, b,
+    b, 0, w, w, w, w, 0, 0, 0, w, 0, w, 0, w, 0, 0, 0, 0, 0, w, 0, w, w, w, b,
     b, 0, w, w, w, w, 0, 0, 0, 0, 0, 0, 0, w, w, w, w, w, w, w, 0, 0, 0, 0, b,
     b, 0, w, w, w, w, w, w, w, w, w, w, 0, w, w, w, w, w, w, w, w, w, w, 0, b,
-    b, 0, 0, 0, 0, 0, w, w, w, w, 0, 0, 0, w, w, w, w, w, w, w, 0, 0, 0, 0, b,
-    b, 0, w, 0, 0, 0, w, w, w, w, 0, 0, 0, w, w, w, w, w, w, w, 0, w, w, w, b,
-    b, 0, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, 0, 0, 0, 0, 0, 0, w, w, w, b,
-    b, 0, w, w, w, 0, w, w, 0, w, 0, 0, 0, w, w, 0, 0, w, w, w, w, w, w, 0, b,
-    b, 0, w, w, w, 0, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
+    b, 0, 0, 0, 0, 0, 0, w, w, w, 0, 0, 0, w, 0, 0, 0, 0, w, w, 0, 0, 0, 0, b,
+    b, 0, w, 0, 0, 0, 0, w, 0, w, 0, 0, 0, w, 0, w, w, w, w, w, 0, w, w, 0, b,
+    b, 0, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, w, 0, 0, 0, 0, 0, 0, 0, w, w, w, b,
+    b, 0, w, w, w, 0, w, w, 0, w, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
+    b, 0, w, w, 0, w, w, w, 0, 0, 0, 0, 0, w, 0, 0, 0, w, w, w, w, w, w, 0, b,
     b, 0, 0, 0, 0, w, w, w, w, 0, w, w, w, 0, 0, 0, 0, 0, 0, w, 0, 0, 0, 0, b,
     b, 0, 0, w, 0, w, w, w, w, 0, w, w, w, w, w, w, w, w, 0, w, 0, w, w, w, b,
     b, 0, 0, w, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, w, w, w, b,
     b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b,
 };
 
+
 GLuint font_TID;
 GLuint tilesetID;
 bool win = false;
 bool lose = false;
 std::string message;
+std::vector<glm::vec3> enemyCords;
+std::vector<glm::vec3> coinCords;
 
 void Level1::Initialize() {
     tilesetID = Util::LoadTexture("resources/sokoban_tilesheet.png");
@@ -110,7 +114,7 @@ void Level1::Render(ShaderProgram* program) {
         message = "You Lose!";
     }
     if (win || lose) {
-        float xpos = state.player->position.x - 1;
+        float xpos = state.player->position.x;
         float ypos = state.player->position.y + 2;
         Util::DrawText(program, font_TID, message, 0.5f, -0.25f, glm::vec3(xpos, ypos, 0));
         Mix_HaltMusic();
@@ -137,7 +141,7 @@ void Level1::InitPlayer() {
     state.player->minMapHeight = -L1_HEIGHT;
 
     state.player->speed = 2.0;
-    state.player->width = 0.85f;
+    state.player->width = 0.8f;
     state.player->height = 1.0f;
 
 
@@ -155,43 +159,88 @@ void Level1::InitPlayer() {
     state.player->animTime = 0;
 }
 
+void Level1::CreateEnemyCords() {
+    enemyCords.push_back(glm::vec3(7, -12, 0));
+    enemyCords.push_back(glm::vec3(11, -18, 0));
+    enemyCords.push_back(glm::vec3(6, -9, 0));
+    enemyCords.push_back(glm::vec3(16, -6, 0));
+    enemyCords.push_back(glm::vec3(14, -19, 0));
+    enemyCords.push_back(glm::vec3(4, -17, 0));
+    enemyCords.push_back(glm::vec3(13, -10, 0));
+    enemyCords.push_back(glm::vec3(17, -11, 0));
+}
+
 void Level1::InitEnemies() {
     state.enemies = new Entity[L1_ENEMY_COUNT];
-    GLuint enemy_TID = Util::LoadTexture("resources/assets/enemy_walk.png");
-
+    GLuint enemy_TID = Util::LoadTexture("resources/assets/spike_idle.png");
+    GLuint walk_TID = Util::LoadTexture("resources/assets/enemy_walk.png");
+    GLuint wait_TID = Util::LoadTexture("resources/assets/spike_moving.png");
+    GLuint fly_TID = Util::LoadTexture("resources/assets/enemy_flying.png");
+    
+    CreateEnemyCords();
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
-        state.enemies[i].textureID = enemy_TID;
+        if (i < 8) {
+
+            state.enemies[i].textureID = enemy_TID;
+            state.enemies[i].position = enemyCords[i];
+        }
         state.enemies[i].entityType = ENEMY;
-        //state.enemies[i].width = 0.8f;
-        state.enemies[i].speed = 0.7f;
+        state.enemies[i].speed = 1.0f;
     }
-    // Wait and Go AI
-    state.enemies[0].position = glm::vec3(5, -23, 0);
-    state.enemies[0].aiType = WAITANDGO;
-    state.enemies[0].aiState = IDLE;
+    // Moving Ai
+    // Left and Right Patrollers
+    state.enemies[8].textureID = walk_TID;
+    state.enemies[8].position = glm::vec3(12, -23, 0);
+    state.enemies[8].aiType = PATROLER;
+    state.enemies[8].aiState = XDIR;
+    // Wait And Go
+    state.enemies[9].textureID = wait_TID;
+    state.enemies[9].position = glm::vec3(8, -18, 0);
+    state.enemies[9].aiType = WAITANDGO;
+    state.enemies[9].aiState = IDLE;
+    // Up and Down
+    state.enemies[10].textureID = fly_TID;
+    state.enemies[10].position = glm::vec3(4, -4, 0);
+    state.enemies[10].aiType = PATROLER;
+    state.enemies[10].aiState = YDIR;
+    // Left and Right
+    state.enemies[11].textureID = fly_TID;
+    state.enemies[11].position = glm::vec3(21, -5, 0);
+    state.enemies[11].aiType = PATROLER;
+    state.enemies[11].aiState = XDIR;
+}
+
+void Level1::CreateCoinCords() {
+    coinCords.push_back(glm::vec3(3, -4, 0));
+    coinCords.push_back(glm::vec3(3, -17, 0));
+    coinCords.push_back(glm::vec3(4, -21, 0));
+    coinCords.push_back(glm::vec3(5, -9, 0));
+    coinCords.push_back(glm::vec3(10, -16, 0));
+    coinCords.push_back(glm::vec3(13, -21, 0));
+    coinCords.push_back(glm::vec3(15, -1, 0));
+    coinCords.push_back(glm::vec3(17, -10, 0));
+    coinCords.push_back(glm::vec3(19, -4, 0));
+    coinCords.push_back(glm::vec3(23, -19, 0));
+    coinCords.push_back(glm::vec3(14, -6, 0));
+    coinCords.push_back(glm::vec3(9, -22, 0));
+    coinCords.push_back(glm::vec3(14, -11, 0));
+    coinCords.push_back(glm::vec3(15, -3, 0));
+    coinCords.push_back(glm::vec3(18, -3, 0));
 }
 
 void Level1::InitCoins() {
     state.coins = new Entity[L1_COIN_COUNT];
     GLuint coin_TID = Util::LoadTexture("resources/assets/coin.png");
 
+    CreateCoinCords();
     for (int i = 0; i < L1_COIN_COUNT; i++) {
         state.coins[i].textureID = coin_TID;
         state.coins[i].entityType = COIN;
-        state.coins[i].sfx = Mix_LoadWAV("resources/sounds/coin.wav");
+        state.coins[i].sfx = Mix_LoadWAV("resources/sounds/coin.wav"); 
+        state.coins[i].position = coinCords[i];
     }
-    // positions of the coins
-    state.coins[0].position = glm::vec3(3, -4, 0);
-    state.coins[1].position = glm::vec3(3, -17, 0);
-    state.coins[2].position = glm::vec3(4, -21, 0);
-    state.coins[3].position = glm::vec3(5, -9, 0);
-    state.coins[4].position = glm::vec3(10, -16, 0);
-    state.coins[5].position = glm::vec3(13, -21, 0);
-    state.coins[6].position = glm::vec3(15, -1, 0);
-    state.coins[7].position = glm::vec3(17, -10, 0);
-    state.coins[8].position = glm::vec3(19, -4, 0);
-    state.coins[9].position = glm::vec3(23, -19, 0);
 }
+
 
 void Level1::InitMusic() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
