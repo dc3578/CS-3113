@@ -16,12 +16,12 @@ bool Entity::CheckCollision(Entity* other) {
     float ydist = fabs(position.y - other->position.y) - ((height + other->height) / 2.0f);
     if (xdist < 0 && ydist < 0) {
         lastCollision = other;
+       
         if (other->entityType == ENEMY) {
             hitEnemy = true;
         } 
         else if (other->entityType == COIN) {
-            Mix_PlayChannel(-1, sfx, 0);
-            coins++;
+            hitCoin = true;
             other->isActive = false;
         }
         return true;
@@ -96,31 +96,37 @@ void Entity::CheckCollisionsY(Map* map)
         position.y -= penetration_y;
         velocity.y = 0;
         collidedTop = true;
+        hitWall = true;
     }
     else if (map->IsSolid(top_left, &penetration_x, &penetration_y) && velocity.y > 0) {
         position.y -= penetration_y;
         velocity.y = 0;
         collidedTop = true;
+        hitWall = true;
     }
     else if (map->IsSolid(top_right, &penetration_x, &penetration_y) && velocity.y > 0) {
         position.y -= penetration_y;
         velocity.y = 0;
         collidedTop = true;
+        hitWall = true;
     }
     if (map->IsSolid(bottom, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
+        hitWall = true;
     }
     else if (map->IsSolid(bottom_left, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
+        hitWall = true;
     }
     else if (map->IsSolid(bottom_right, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
+        hitWall = true;
     }
 }
 
@@ -136,12 +142,14 @@ void Entity::CheckCollisionsX(Map* map)
         position.x += penetration_x;
         velocity.x = 0;
         collidedLeft = true;
+        hitWall = true;
     }
 
     if (map->IsSolid(right, &penetration_x, &penetration_y) && velocity.x > 0) {
         position.x -= penetration_x;
         velocity.x = 0;
         collidedRight = true;
+        hitWall = true;
     }
 }
 
@@ -186,41 +194,53 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
         }
     }
 
-    velocity.x = movement.x * speed;
-    velocity.y = movement.y * speed;
-    velocity += acceleration * deltaTime;
+    
+    if (entityType != COIN) {
+        velocity.x = movement.x * speed;
+        velocity.y = movement.y * speed;
+        velocity += acceleration * deltaTime;
 
-    position.y += velocity.y * deltaTime; // Move on Y
-    CheckCollisionsY(map);
+        position.y += velocity.y * deltaTime; // Move on Y
+        CheckCollisionsY(map);
 
-    position.x += velocity.x * deltaTime; // Move on X
-    CheckCollisionsX(map);
+        position.x += velocity.x * deltaTime; // Move on X
+        CheckCollisionsX(map);
+    }
+   
 
-    // if player then check collision with enemy
+    // if player then check collision with object
     if (entityType == PLAYER) {
         CheckCollisionsY(objects, objectCount); // Fix if needed
         CheckCollisionsX(objects, objectCount); // Fix if needed
+
+        if (hitCoin) {
+            coins++;
+            Mix_PlayChannel(-1, sfx, 0);
+            hitCoin = false;
+        }
         // update hit enemy flags after hitting enemy
-        if (hitEnemy) {
+        else if (hitEnemy) {
             if (hitEnemyHead) {
                 lastCollision->isActive = false;
                 hitEnemyHead = false;
-                coins++;
             }
             else {
                 died = true;
             }
             hitEnemy = false;
         }
+        else if (hitWall) {
+            Mix_PlayChannel(-1, bumpSound, 0);
+            hitWall = false;
+        }
     }
 
     // restart at saved point when dead
-    if (died || position.y <= -16) {
+    if (died || position.y <= minMapHeight) {
         position = savedPoint;
         lives--;
         died = false;
     }
-
     // this is so enemies can't go through players
     else if (entityType == ENEMY) {
         CheckCollisionsY(player, 1); // Fix if needed
@@ -229,8 +249,6 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
 
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
-   
-    
 }
 
 void Entity::AIJumper() {

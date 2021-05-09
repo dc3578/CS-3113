@@ -36,8 +36,8 @@ Scene* sceneList[LEVEL_COUNT];
 
 bool gameIsRunning = true;
 bool startgame = false;
-int view_x = -5;
-int view_y = 10;
+float view_x = 0;
+float view_y = 0;
 
 
 void SwitchToScene(Scene* scene) {
@@ -167,23 +167,28 @@ void Update() {
 
         viewMatrix = glm::mat4(1.0f);
 
+        float xpos = currentScene->state.player->position.x;
+        float ypos = currentScene->state.player->position.y;
         // conditions to move view matrix in x direction
-        if (currentScene->state.player->position.x > 5) {
-            view_x = -currentScene->state.player->position.x;
+        if (xpos > 19) {
+            view_x = -19;
+        }
+        else if (xpos > 5) {
+            view_x = -xpos;
         }
         else {
             view_x = -5;
         }
 
         // conditions to move view matrix in y direciton
-        if (currentScene->state.player->position.y > -10 && currentScene->state.player->position.y < -4) {
+        if (ypos > -20 && ypos < -5) {
             view_y = -currentScene->state.player->position.y;
         }
-        else if (currentScene->state.player->position.y > -4) {
+        else if (ypos > -5) {
             view_y = 4;
         }
-        else if (currentScene->state.player->position.y < -10) {
-            view_y = 10;
+        else if (ypos < -20) {
+            view_y = 20;
         } 
         viewMatrix = glm::translate(viewMatrix, glm::vec3(view_x, view_y, 0));
 

@@ -32,4 +32,5 @@ public:
 	virtual void InitPlayer() = 0;
 	virtual void InitEnemies() = 0;
 	virtual void InitMusic() = 0;
+	virtual void InitCoins() = 0;
 };

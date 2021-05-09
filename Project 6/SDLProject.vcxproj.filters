@@ -85,6 +85,15 @@
     <Image Include="resources\tileset.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\sokoban_tilesheet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\player.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\assets\coin.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\wholesome.mp3" />

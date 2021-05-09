@@ -151,11 +151,14 @@
     <None Include="smpeg2.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\assets\coin.png" />
     <Image Include="resources\font1.png" />
     <Image Include="resources\george_0.png" />
     <Image Include="resources\heart.png" />
     <Image Include="resources\ken.png" />
     <Image Include="resources\platform_landing.png" />
+    <Image Include="resources\player.png" />
+    <Image Include="resources\sokoban_tilesheet.png" />
     <Image Include="resources\tileset.png" />
   </ItemGroup>
   <ItemGroup>

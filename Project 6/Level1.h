@@ -8,4 +8,5 @@ public:
 	void InitPlayer() override;
 	void InitEnemies() override;
 	void InitMusic() override;
+	void InitCoins() override;
 };

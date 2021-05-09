@@ -15,7 +15,7 @@
 #include <SDL_mixer.h>
 
 enum EntityType {PLAYER, PLATFORM, ENEMY, COIN};
-enum AIType {WAITANDGO, CHASER, JUMPER};
+enum AIType {WAITANDGO, CHASER, JUMPER, SPIKE};
 enum AIState {IDLE, WALKING, CHASING, JUMPING};
 
 class Entity {
@@ -34,7 +34,9 @@ public:
     
     int coins = 0;
     int lives = 3;
+    int minMapHeight = 0;
     bool died = false;
+    Mix_Chunk* bumpSound;
     Mix_Chunk* sfx;
     
     bool jump = false;
@@ -62,6 +64,8 @@ public:
     bool collidedRight = false;
     bool hitEnemy = false;
     bool hitEnemyHead = false;
+    bool hitWall = false;
+    bool hitCoin = false;
     Entity* lastCollision = NULL;
     Entity();
     

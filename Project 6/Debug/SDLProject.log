@@ -1,12 +1,2 @@
-﻿  main.cpp
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\main.cpp(172,22): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\main.cpp(180,22): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
+﻿  Level1.cpp
   SDLProject.vcxproj -> C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\Debug\SDLProject.exe
