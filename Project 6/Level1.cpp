@@ -50,7 +50,7 @@ std::vector<glm::vec3> coinCords;
 
 void Level1::Initialize() {
     tilesetID = Util::LoadTexture("resources/sokoban_tilesheet.png");
-    font_TID = Util::LoadTexture("resources/font1.png");
+    font_TID = Util::LoadTexture("resources/font.png");
     state.map = new Map(L1_WIDTH, L1_HEIGHT, level1_data, tilesetID, 1.0f, 13, 8);
     state.nextScene = -1;
     // initialization of things

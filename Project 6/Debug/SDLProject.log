@@ -1,12 +1,4 @@
-﻿  Entity.cpp
-  Level1.cpp
+﻿  Level1.cpp
   main.cpp
-  Map.cpp
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\Map.cpp(90,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\Map.cpp(91,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-  Scene.cpp
-  ShaderProgram.cpp
-  Util.cpp
-C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\Util.cpp(35,20): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
   SDLProject.vcxproj -> C:\Users\David\Desktop\Personal Projects\CS3113\Project 6\Debug\SDLProject.exe

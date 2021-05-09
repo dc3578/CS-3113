@@ -71,7 +71,7 @@ void Initialize() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // get font texture ID
-    fontTextureID = Util::LoadTexture("resources/font1.png");
+    fontTextureID = Util::LoadTexture("resources/font.png");
 
     // Init Levels
     sceneList[0] = new Level1();
