@@ -15,14 +15,18 @@ bool Entity::CheckCollision(Entity* other) {
     float xdist = fabs(position.x - other->position.x) - ((width + other->width) / 2.0f);
     float ydist = fabs(position.y - other->position.y) - ((height + other->height) / 2.0f);
     if (xdist < 0 && ydist < 0) {
-        lastCollision = other;
-       
-        if (other->entityType == ENEMY) {
+        
+        // when player touch enemy
+        if (entityType == PLAYER && other->entityType == ENEMY) {
             hitEnemy = true;
+            lastCollision = other;
         } 
-        else if (other->entityType == COIN) {
-            hitCoin = true;
-            other->isActive = false;
+        // when coin touches player
+        else if (entityType == COIN && other->entityType == PLAYER) {
+            isActive = false;
+            other->hitCoin = true;
+            other->coins++;
+            other->lastCollision = this;
         }
         return true;
     }
@@ -186,15 +190,6 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
         }
     }
 
-    if (jump) {
-        jump = false;
-        velocity.y += jumpPower;
-        if (entityType == PLAYER) {
-            Mix_PlayChannel(-1, sfx, 0);
-        }
-    }
-
-    
     if (entityType != COIN) {
         velocity.x = movement.x * speed;
         velocity.y = movement.y * speed;
@@ -215,7 +210,7 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
 
         if (hitCoin) {
             coins++;
-            Mix_PlayChannel(-1, sfx, 0);
+            Mix_PlayChannel(-1, lastCollision->sfx, 0);
             hitCoin = false;
         }
         // update hit enemy flags after hitting enemy
@@ -232,20 +227,21 @@ void Entity::Update(float deltaTime, Entity* player, Entity* objects, int object
         else if (hitWall) {
             Mix_PlayChannel(-1, bumpSound, 0);
             hitWall = false;
+            
+        }
+
+        // restart at saved point when dead
+        if (died || position.y <= minMapHeight) {
+            position = savedPoint;
+            lives--;
+            died = false;
         }
     }
-
-    // restart at saved point when dead
-    if (died || position.y <= minMapHeight) {
-        position = savedPoint;
-        lives--;
-        died = false;
-    }
-    // this is so enemies can't go through players
-    else if (entityType == ENEMY) {
+    // this is so enemies and coins can't go through players
+    else if (entityType == ENEMY || entityType == COIN) {
         CheckCollisionsY(player, 1); // Fix if needed
         CheckCollisionsX(player, 1); // Fix if needed
-    }
+    } 
 
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);

@@ -231,7 +231,6 @@ int main(int argc, char* argv[]) {
     while (gameIsRunning) {
         ProcessInput();
         Update();
-        UpdateScene();
         Render();
     }
 

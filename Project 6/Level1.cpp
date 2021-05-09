@@ -1,7 +1,7 @@
 #include "Level1.h"
 
-#define L1_ENEMY_COUNT 5
-#define L1_COIN_COUNT 1
+#define L1_ENEMY_COUNT 1
+#define L1_COIN_COUNT 10
 
 //exit at 7,-3
 #define L1_WIDTH 25
@@ -54,6 +54,7 @@ void Level1::Initialize() {
 
 void Level1::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, L1_ENEMY_COUNT, state.map);
+    //state.player->Update(deltaTime, state.player, state.coins, L1_ENEMY_COUNT, state.map);
 
     // update enemies 
     for (int i = 0; i < L1_ENEMY_COUNT; i++) {
@@ -89,7 +90,7 @@ void Level1::Render(ShaderProgram* program) {
     // render lives
     float x = state.player->position.x - 0.25f;
     float y = state.player->position.y + 0.5f;
-    
+
     Util::DrawText(program, font_TID, "Lives: " + std::to_string(state.player->lives), 0.25f, -0.15f, glm::vec3(x, y, 0));
 
     // lose condition
@@ -97,7 +98,7 @@ void Level1::Render(ShaderProgram* program) {
         Util::DrawText(program, font_TID, "You Lose!", 0.5f, -0.25f, glm::vec3(4.5, -2.5, 0));
         Mix_HaltMusic();
         state.gameover = true;
-        
+
         //stop all enemy movement
         for (int i = 0; i < L1_ENEMY_COUNT; i++) {
             state.enemies[i].acceleration = glm::vec3(0);
@@ -118,20 +119,21 @@ void Level1::InitPlayer() {
     state.player->bumpSound = Mix_LoadWAV("resources/sounds/bump.wav");
     Mix_VolumeChunk(state.player->bumpSound, MIX_MAX_VOLUME / 5);
 
+    state.player->minMapHeight = -L1_HEIGHT;
+
     state.player->speed = 2.0;
     state.player->width = 0.8f;
-    state.player->height = 1.0f;
-    state.player->minMapHeight = -L1_HEIGHT;
+    state.player->height = 0.8f;
 
 
     state.player->animRight = new int[4]{ 4, 3, 4, 5 };
-    state.player->animLeft  = new int[4]{ 10, 9, 10, 11 };
-    state.player->animUp    = new int[4]{ 7, 6, 7, 8 };
-    state.player->animDown  = new int[4]{ 1, 0, 1, 2 };
+    state.player->animLeft = new int[4]{ 10, 9, 10, 11 };
+    state.player->animUp = new int[4]{ 7, 6, 7, 8 };
+    state.player->animDown = new int[4]{ 1, 0, 1, 2 };
 
     state.player->animRows = 4;
     state.player->animCols = 3;
-    
+
     state.player->animIndices = state.player->animRight;
     state.player->animFrames = 4;
     state.player->animIndex = 0;
@@ -150,7 +152,7 @@ void Level1::InitEnemies() {
         state.enemies[i].speed = 0.7f;
     }
     // Wait and Go AI
-    state.enemies[0].position = glm::vec3(1, -21, 0);
+    state.enemies[0].position = glm::vec3(5, -23, 0);
     state.enemies[0].aiType = WAITANDGO;
     state.enemies[0].aiState = IDLE;
 }
@@ -165,8 +167,8 @@ void Level1::InitCoins() {
         state.coins[i].entityType = COIN;
         state.coins[i].sfx = Mix_LoadWAV("resources/sounds/coin.wav");
     }
-    state.coins[0].position = glm::vec3(4, -21, 0);
-   /* state.coins[0].position = glm::vec3(3, -4, 0);
+
+    state.coins[0].position = glm::vec3(3, -4, 0);
     state.coins[1].position = glm::vec3(3, -17, 0);
     state.coins[2].position = glm::vec3(4, -21, 0);
     state.coins[3].position = glm::vec3(5, -9, 0);
@@ -175,7 +177,7 @@ void Level1::InitCoins() {
     state.coins[6].position = glm::vec3(15, -1, 0);
     state.coins[7].position = glm::vec3(17, -10, 0);
     state.coins[8].position = glm::vec3(19, -4, 0);
-    state.coins[9].position = glm::vec3(23, -19, 0);*/
+    state.coins[9].position = glm::vec3(23, -19, 0);
 }
 
 void Level1::InitMusic() {
